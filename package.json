@@ -1,7 +1,7 @@
 {
     "name":  "streaming-project",
     "version":  "1.0.0",
-    "description":  "Semua aplikasi telah terpasang dan **sedang aktif berjalan**:",
+    "description": "YukNonton - Modern Web Streaming Platform with Cinemeta & Stremio Resolver and Multi-Source Player",
     "main":  "index.js",
     "scripts":  {
                     "start":  "node server/index.js"
