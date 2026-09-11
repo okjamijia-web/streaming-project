@@ -1,6 +1,6 @@
-# Netflix Clone + Stremio Streaming Web App
+# YukNonton - Streaming Web App (Film & Serial TV Sub Indo)
 
-Web aplikasi streaming modern dengan antarmuka Netflix dan backend Stremio resolver. Siap dideploy di Vercel dan dijalankan secara lokal.
+Web aplikasi streaming modern YukNonton dengan antarmuka elegan dan katalog lengkap film serta serial TV. Siap dideploy di Vercel dan dijalankan secara lokal.
 
 ## Status Layanan di Komputer Anda
 Semua aplikasi telah terpasang dan **sedang aktif berjalan**:

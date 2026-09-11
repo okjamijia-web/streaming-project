@@ -85,7 +85,7 @@ app.use((req, res) => {
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`=======================================================`);
-    console.log(`🎬 NETFLIX UI + STREMIO BACKEND SERVER IS RUNNING!`);
+    console.log(`🎬 YUKNONTON UI + STREMIO BACKEND SERVER IS RUNNING!`);
     console.log(`🌐 Web URL: http://localhost:${PORT}`);
     console.log(`=======================================================`);
   });

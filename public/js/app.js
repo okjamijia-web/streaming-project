@@ -1,4 +1,4 @@
-// Netflix Frontend Application Controller
+// YukNonton Frontend Application Controller
 class NetflixApp {
   constructor() {
     this.catalog = null;
@@ -61,7 +61,7 @@ class NetflixApp {
 
     // State
     this.currentCategory = "home";
-    this.myList = JSON.parse(localStorage.getItem("netflix_my_list") || "[]");
+    this.myList = JSON.parse(localStorage.getItem("yuknonton_my_list") || localStorage.getItem("netflix_my_list") || "[]");
     this.currentHeroItem = null;
 
     // Modal
@@ -476,7 +476,7 @@ class NetflixApp {
     this.heroOverview.textContent = hero.overview;
     this.heroBadge.textContent = `#${hero.top10 || 1} in Indonesia Today`;
     if (this.heroTypeBadge) {
-      this.heroTypeBadge.textContent = badge || (hero.type === "series" ? "Netflix Series" : "Netflix Film");
+      this.heroTypeBadge.textContent = badge || (hero.type === "series" ? "YukNonton Series" : "YukNonton Film");
     }
 
     this.heroPlayBtn.onclick = () => this.openPlayer(hero);
@@ -542,7 +542,7 @@ class NetflixApp {
 
   saveMyList() {
     try {
-      localStorage.setItem("netflix_my_list", JSON.stringify(this.myList));
+      localStorage.setItem("yuknonton_my_list", JSON.stringify(this.myList));
     } catch (e) {}
   }
 

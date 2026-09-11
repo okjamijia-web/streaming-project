@@ -96,7 +96,7 @@ class StremioService {
 
 1
 00:00:02.000 --> 00:00:06.000
-Halo! Selamat datang di Website Streaming Netflix + Stremio.
+Halo! Selamat datang di Website Streaming YukNonton.
 `;
     }
 
@@ -104,7 +104,7 @@ Halo! Selamat datang di Website Streaming Netflix + Stremio.
 
 1
 00:00:02.000 --> 00:00:06.000
-Hello! Welcome to the Netflix + Stremio Streaming Platform.
+Hello! Welcome to the YukNonton Streaming Platform.
 `;
   }
 }

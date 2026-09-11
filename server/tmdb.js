@@ -141,14 +141,14 @@ class TmdbService {
       const categories = {
         home: {
           hero: heroItem,
-          heroTypeBadge: heroItem.type === "series" ? "Netflix Series" : "Netflix Film",
+          heroTypeBadge: heroItem.type === "series" ? "YukNonton Series" : "YukNonton Film",
           top10: top10,
           top10Title: "Top 10 Tayangan Hari Ini di Indonesia",
           rows: rows
         },
         series: {
           hero: seriesHero,
-          heroTypeBadge: "Netflix Series",
+          heroTypeBadge: "YukNonton Series",
           top10: seriesTop10,
           top10Title: "Top 10 Serial TV Hari Ini di Indonesia",
           rows: [
@@ -160,7 +160,7 @@ class TmdbService {
         },
         movies: {
           hero: movieHero,
-          heroTypeBadge: "Netflix Film",
+          heroTypeBadge: "YukNonton Film",
           top10: moviesTop10,
           top10Title: "Top 10 Film Hari Ini di Indonesia",
           rows: [
@@ -177,7 +177,7 @@ class TmdbService {
           top10Title: "Top 10 Paling Banyak Ditonton Minggu Ini",
           rows: [
             { id: "popular-now", title: "🔥 Paling Ramai Dibicarakan Saat Ini", items: [...topMovies.slice(0, 8), ...topSeries.slice(0, 8)] },
-            { id: "fresh-movies", title: "✨ Rilis Baru Pilihan di Netflix", items: topMovies.slice(5, 20) },
+            { id: "fresh-movies", title: "✨ Rilis Baru Pilihan di YukNonton", items: topMovies.slice(5, 20) },
             { id: "fresh-series", title: "🌟 Serial TV Terbaru yang Wajib Ditonton", items: topSeries.slice(5, 20) }
           ].filter(r => r.items.length > 0)
         }

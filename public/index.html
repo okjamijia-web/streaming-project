@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Netflix - Watch TV Shows Online, Watch Movies Online</title>
-  <link rel="icon" type="image/x-icon" href="https://assets.nflxext.com/us/ffe/siteui/common/icons/nficon2016.ico" />
+  <title>YukNonton - Nonton Film & Serial TV Streaming Sub Indo</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23E50914'><polygon points='5 3 19 12 5 21 5 3'/></svg>" />
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -36,8 +36,15 @@
   <!-- ================= NAVBAR ================= -->
   <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 md:px-12 py-3 bg-gradient-to-b from-black/80 to-transparent transition duration-500">
     <div class="flex items-center space-x-6 md:space-x-10">
-      <a href="#" id="brandLogo" class="text-netflixRed text-2xl md:text-3xl font-extrabold tracking-tighter uppercase font-serif cursor-pointer hover:opacity-90 transition">
-        NETFLIX
+      <a href="#" id="brandLogo" class="flex items-center space-x-2 md:space-x-2.5 cursor-pointer hover:opacity-90 transition group select-none" title="YukNonton Beranda">
+        <div class="w-8 h-8 md:w-9 md:h-9 rounded-lg bg-netflixRed flex items-center justify-center shadow-lg shadow-red-600/30 group-hover:scale-105 transition-transform">
+          <svg class="w-4 h-4 md:w-5 md:h-5 text-white fill-white ml-0.5" viewBox="0 0 24 24">
+            <polygon points="5 3 19 12 5 21 5 3"/>
+          </svg>
+        </div>
+        <div class="flex items-center tracking-tight font-black uppercase text-xl md:text-2xl font-sans">
+          <span class="text-netflixRed">YUK</span><span class="text-white ml-1">NONTON</span>
+        </div>
       </a>
       <ul id="desktopNav" class="hidden md:flex items-center space-x-5 text-sm text-gray-300 font-medium">
         <li><a href="#" class="nav-link text-white font-bold transition cursor-pointer" data-category="home">Home</a></li>
@@ -141,7 +148,7 @@
       <div class="absolute inset-0 hero-vignette flex flex-col justify-center px-4 md:px-12 pb-16">
         <div class="max-w-2xl">
           <div class="flex items-center space-x-2 mb-3">
-            <span id="heroTypeBadge" class="bg-netflixRed text-white text-[10px] md:text-xs font-bold px-2 py-0.5 rounded tracking-wider uppercase">Netflix Series</span>
+            <span id="heroTypeBadge" class="bg-netflixRed text-white text-[10px] md:text-xs font-bold px-2 py-0.5 rounded tracking-wider uppercase">YukNonton Series</span>
             <span id="heroBadge" class="text-xs md:text-sm font-bold text-gray-200"></span>
           </div>
 
