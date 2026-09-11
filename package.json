@@ -1,0 +1,20 @@
+﻿{
+    "name":  "streaming-project",
+    "version":  "1.0.0",
+    "description":  "Semua aplikasi telah terpasang dan **sedang aktif berjalan**:",
+    "main":  "index.js",
+    "scripts":  {
+                    "start":  "node server/index.js"
+                },
+    "keywords":  [
+
+                 ],
+    "author":  "",
+    "license":  "ISC",
+    "type":  "commonjs",
+    "dependencies":  {
+                         "cors":  "^2.8.6",
+                         "dotenv":  "^17.4.2",
+                         "express":  "^5.2.1"
+                     }
+}
