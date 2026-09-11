@@ -200,6 +200,94 @@ class TmdbService {
     }
   }
 
+  async getGenreCatalog(genreName) {
+    if (!this.genreCache) this.genreCache = {};
+    const now = Date.now();
+    const cacheKey = (genreName || "Action").toLowerCase();
+    if (this.genreCache[cacheKey] && (now - this.genreCache[cacheKey].timestamp < 3600000)) {
+      return this.genreCache[cacheKey].data;
+    }
+
+    const cinemetaGenre = genreName === "Science Fiction" ? "Sci-Fi" : genreName;
+
+    try {
+      const [moviesRes, seriesRes] = await Promise.allSettled([
+        fetch(`${this.cinemetaBase}/catalog/movie/top/genre=${encodeURIComponent(cinemetaGenre)}.json`).then(r => r.json()),
+        fetch(`${this.cinemetaBase}/catalog/series/top/genre=${encodeURIComponent(cinemetaGenre)}.json`).then(r => r.json())
+      ]);
+
+      const formatMeta = (m, type = "movie") => ({
+        id: m.id,
+        imdbId: m.id,
+        tmdbId: m.moviedb_id || null,
+        title: m.name,
+        type: m.type || type,
+        match: m.imdbRating ? `${Math.round(parseFloat(m.imdbRating) * 10)}% Match` : `${Math.floor(Math.random() * 6) + 94}% Match`,
+        year: m.releaseInfo || m.year || "2024",
+        rating: type === "series" ? "16+" : "13+",
+        duration: type === "series" ? "Series" : "Movie",
+        quality: "4K Ultra HD",
+        overview: m.description || `Saksikan tayangan ${m.name} kategori ${genreName} dalam kualitas Full HD dan 4K.`,
+        poster: m.poster || "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
+        backdrop: m.background || m.poster
+      });
+
+      const movies = (moviesRes.status === "fulfilled" && moviesRes.value && moviesRes.value.metas)
+        ? moviesRes.value.metas.map(m => formatMeta(m, "movie"))
+        : [];
+
+      const series = (seriesRes.status === "fulfilled" && seriesRes.value && seriesRes.value.metas)
+        ? seriesRes.value.metas.map(m => formatMeta(m, "series"))
+        : [];
+
+      const combined = [...movies, ...series].sort(() => 0.5 - Math.random());
+      const top10 = (movies.length > 0 ? movies : series).slice(0, 10).map((item, idx) => ({ ...item, top10: idx + 1 }));
+
+      let heroItem = movies[0] || series[0] || this.fallback.trending[0];
+      try {
+        if (heroItem) {
+          const detail = await this.getDetail(heroItem.id, heroItem.type);
+          if (detail) heroItem = detail;
+        }
+      } catch (e) {}
+
+      const rows = [
+        { id: `${cacheKey}-trending`, title: `🔥 Populer & Sedang Tren di ${genreName}`, items: combined.slice(0, 15) },
+        { id: `${cacheKey}-movies`, title: `🎬 Film ${genreName} Pilihan Terbaik`, items: movies.slice(0, 15) },
+        { id: `${cacheKey}-series`, title: `📺 Serial TV ${genreName} Penuh Ketegangan`, items: series.slice(0, 15) },
+        { id: `${cacheKey}-more`, title: `🍿 Rekomendasi ${genreName} Lainnya`, items: combined.slice(15, 30) }
+      ].filter(r => r.items.length > 0);
+
+      const result = {
+        genre: genreName,
+        hero: heroItem,
+        heroTypeBadge: `Kategori: ${genreName}`,
+        top10: top10,
+        top10Title: `Top 10 ${genreName} Hari Ini di Indonesia`,
+        rows: rows
+      };
+
+      this.genreCache[cacheKey] = {
+        timestamp: now,
+        data: result
+      };
+
+      return result;
+    } catch (err) {
+      console.error(`Failed to fetch genre ${genreName}:`, err.message);
+      return {
+        genre: genreName,
+        hero: this.fallback.trending[0],
+        heroTypeBadge: `Kategori: ${genreName}`,
+        top10: this.fallback.trending,
+        top10Title: `Top 10 ${genreName} Hari Ini`,
+        rows: [
+          { id: `${cacheKey}-trending`, title: `Koleksi ${genreName}`, items: this.fallback.trending }
+        ]
+      };
+    }
+  }
+
   async getDetail(id, type = "movie") {
     // Check fallback
     const found = this.fallback.trending.find(item => item.id === id || item.imdbId === id);

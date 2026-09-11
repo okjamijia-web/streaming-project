@@ -23,6 +23,16 @@ app.get("/api/catalog", async (req, res) => {
   }
 });
 
+// API: Genre / Category Catalog
+app.get("/api/genre/:genre", async (req, res) => {
+  try {
+    const data = await tmdb.getGenreCatalog(req.params.genre);
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch genre catalog", details: err.message });
+  }
+});
+
 // API: Detail Film / Serial
 app.get("/api/detail/:id", async (req, res) => {
   try {

@@ -18,7 +18,14 @@ class NetflixApp {
     this.navbar = document.getElementById("navbar");
     this.brandLogo = document.getElementById("brandLogo");
     this.desktopNav = document.getElementById("desktopNav");
+    this.categoryDropdownBtn = document.getElementById("categoryDropdownBtn");
+    this.categoryDropdownMenu = document.getElementById("categoryDropdownMenu");
+    this.categoryDropdownArrow = document.getElementById("categoryDropdownArrow");
+    this.currentCategoryLabel = document.getElementById("currentCategoryLabel");
     this.mobileCategoryBar = document.getElementById("mobileCategoryBar");
+    this.mobileCategoryBtn = document.getElementById("mobileCategoryBtn");
+    this.mobileCategoryMenu = document.getElementById("mobileCategoryMenu");
+    this.mobileCategoryLabel = document.getElementById("mobileCategoryLabel");
     this.searchInput = document.getElementById("searchInput");
     this.refreshTrendingBtn = document.getElementById("refreshTrendingBtn");
     this.searchResultsContainer = document.getElementById("searchResultsContainer");
@@ -135,12 +142,68 @@ class NetflixApp {
     if (this.mobileCategoryBar) {
       this.mobileCategoryBar.addEventListener("click", (e) => {
         const btn = e.target.closest("[data-category]");
-        if (!btn) return;
+        if (!btn || btn.id === "mobileCategoryBtn") return;
         e.preventDefault();
         const cat = btn.getAttribute("data-category");
         this.switchCategory(cat);
       });
     }
+
+    // Category Dropdown Toggle (Desktop)
+    if (this.categoryDropdownBtn) {
+      this.categoryDropdownBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const isHidden = this.categoryDropdownMenu.classList.contains("hidden");
+        this.categoryDropdownMenu.classList.toggle("hidden");
+        if (this.categoryDropdownArrow) {
+          this.categoryDropdownArrow.style.transform = isHidden ? "rotate(180deg)" : "rotate(0deg)";
+        }
+      });
+    }
+
+    // Genre Item Selection (Desktop)
+    if (this.categoryDropdownMenu) {
+      this.categoryDropdownMenu.addEventListener("click", (e) => {
+        const item = e.target.closest("[data-genre]");
+        if (!item) return;
+        e.preventDefault();
+        const genre = item.getAttribute("data-genre");
+        this.categoryDropdownMenu.classList.add("hidden");
+        if (this.categoryDropdownArrow) this.categoryDropdownArrow.style.transform = "rotate(0deg)";
+        this.selectGenre(genre);
+      });
+    }
+
+    // Category Dropdown Toggle (Mobile)
+    if (this.mobileCategoryBtn) {
+      this.mobileCategoryBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        this.mobileCategoryMenu.classList.toggle("hidden");
+      });
+    }
+
+    // Genre Item Selection (Mobile)
+    if (this.mobileCategoryMenu) {
+      this.mobileCategoryMenu.addEventListener("click", (e) => {
+        const item = e.target.closest("[data-genre]");
+        if (!item) return;
+        e.preventDefault();
+        const genre = item.getAttribute("data-genre");
+        this.mobileCategoryMenu.classList.add("hidden");
+        this.selectGenre(genre);
+      });
+    }
+
+    // Click outside to close dropdowns
+    document.addEventListener("click", (e) => {
+      if (this.categoryDropdownMenu && !this.categoryDropdownMenu.contains(e.target) && e.target !== this.categoryDropdownBtn) {
+        this.categoryDropdownMenu.classList.add("hidden");
+        if (this.categoryDropdownArrow) this.categoryDropdownArrow.style.transform = "rotate(0deg)";
+      }
+      if (this.mobileCategoryMenu && !this.mobileCategoryMenu.contains(e.target) && e.target !== this.mobileCategoryBtn) {
+        this.mobileCategoryMenu.classList.add("hidden");
+      }
+    });
 
     // Hero My List Toggle
     if (this.heroListBtn) {
@@ -298,6 +361,16 @@ class NetflixApp {
       });
     }
 
+    // Reset category dropdown label & styling
+    if (this.currentCategoryLabel) this.currentCategoryLabel.textContent = "Category";
+    if (this.mobileCategoryLabel) this.mobileCategoryLabel.textContent = "Category";
+    if (this.categoryDropdownBtn) {
+      this.categoryDropdownBtn.className = "flex items-center space-x-1.5 font-bold text-gray-300 hover:text-white transition cursor-pointer py-1.5 focus:outline-none";
+    }
+    if (this.mobileCategoryBtn) {
+      this.mobileCategoryBtn.className = "mobile-nav-btn px-3.5 py-1.5 rounded-full border border-gray-700 bg-black/40 text-gray-300 hover:text-white transition whitespace-nowrap cursor-pointer flex items-center space-x-1";
+    }
+
     if (category === "mylist") {
       // Display My List View
       if (this.heroBillboard) this.heroBillboard.classList.add("hidden");
@@ -321,6 +394,74 @@ class NetflixApp {
           this.renderRows(catData.rows);
         }
       }
+    }
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (window.lucide) lucide.createIcons();
+  }
+
+  async selectGenre(genreName) {
+    this.currentCategory = "genre:" + genreName;
+
+    // If search active, hide it
+    if (this.searchResultsContainer && !this.searchResultsContainer.classList.contains("hidden")) {
+      if (this.searchInput) this.searchInput.value = "";
+      this.searchResultsContainer.innerHTML = "";
+      this.searchResultsContainer.classList.add("hidden");
+      this.mainContent.classList.remove("hidden");
+    }
+
+    // Reset Desktop Nav links
+    if (this.desktopNav) {
+      this.desktopNav.querySelectorAll(".nav-link").forEach(link => {
+        link.className = "nav-link text-gray-400 hover:text-white transition cursor-pointer";
+      });
+    }
+
+    // Highlight Category dropdown button (Desktop)
+    if (this.currentCategoryLabel) this.currentCategoryLabel.textContent = genreName;
+    if (this.categoryDropdownBtn) {
+      this.categoryDropdownBtn.className = "flex items-center space-x-1.5 font-bold text-white border-b-2 border-netflixRed pb-1 transition cursor-pointer py-1.5 focus:outline-none";
+    }
+
+    // Reset Mobile Nav buttons
+    if (this.mobileCategoryBar) {
+      this.mobileCategoryBar.querySelectorAll(".mobile-nav-btn").forEach(btn => {
+        if (btn !== this.mobileCategoryBtn) {
+          btn.className = "mobile-nav-btn px-3.5 py-1.5 rounded-full border border-gray-700 bg-black/40 text-gray-300 hover:text-white transition whitespace-nowrap cursor-pointer";
+        }
+      });
+    }
+
+    // Highlight Mobile Category button
+    if (this.mobileCategoryLabel) this.mobileCategoryLabel.textContent = genreName;
+    if (this.mobileCategoryBtn) {
+      this.mobileCategoryBtn.className = "mobile-nav-btn px-3.5 py-1.5 rounded-full border border-white bg-white text-black font-bold transition whitespace-nowrap cursor-pointer flex items-center space-x-1";
+    }
+
+    // Display Hero and Rows, hide My List
+    if (this.heroBillboard) this.heroBillboard.classList.remove("hidden");
+    if (this.carouselRowsWrapper) this.carouselRowsWrapper.classList.remove("hidden");
+    if (this.myListSection) this.myListSection.classList.add("hidden");
+
+    // Loading indicator in rows
+    if (this.rowsContainer) {
+      this.rowsContainer.innerHTML = `
+        <div class="flex items-center justify-center py-24 text-gray-400">
+          <div class="w-10 h-10 border-4 border-netflixRed border-t-transparent rounded-full animate-spin mr-3"></div>
+          <span class="font-bold text-base text-gray-200">Memuat Kategori ${genreName}...</span>
+        </div>
+      `;
+    }
+
+    try {
+      const res = await fetch(`/api/genre/${encodeURIComponent(genreName)}`);
+      const data = await res.json();
+      this.renderHero(data.hero, data.heroTypeBadge);
+      this.renderTop10(data.top10, data.top10Title);
+      this.renderRows(data.rows);
+    } catch (err) {
+      console.error(`Failed to load genre ${genreName}:`, err);
     }
 
     window.scrollTo({ top: 0, behavior: "smooth" });
