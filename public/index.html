@@ -186,7 +186,19 @@
         <h2 id="top10Title" class="text-lg md:text-xl lg:text-2xl font-bold mb-3 px-4 md:px-12 text-gray-100 flex items-center space-x-2">
           Top 10 Tayangan Hari Ini di Indonesia
         </h2>
-        <div id="top10Row" class="flex items-center space-x-4 md:space-x-6 overflow-x-auto hide-scrollbar px-4 md:px-12 py-4"></div>
+        <div class="relative">
+          <button id="top10PrevBtn" class="absolute left-0 top-0 bottom-0 z-40 w-10 md:w-12 bg-black/60 hover:bg-black/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300 cursor-pointer" aria-label="Scroll left">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m15 18-6-6 6-6"/>
+            </svg>
+          </button>
+          <div id="top10Row" class="flex items-center space-x-4 md:space-x-6 overflow-x-auto hide-scrollbar px-4 md:px-12 scroll-smooth py-4"></div>
+          <button id="top10NextBtn" class="absolute right-0 top-0 bottom-0 z-40 w-10 md:w-12 bg-black/60 hover:bg-black/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300 cursor-pointer" aria-label="Scroll right">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m9 18 6-6-6-6"/>
+            </svg>
+          </button>
+        </div>
       </div>
 
       <!-- DYNAMIC ROWS -->

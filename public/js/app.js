@@ -48,6 +48,8 @@ class NetflixApp {
     this.top10Section = document.getElementById("top10Section");
     this.top10Title = document.getElementById("top10Title");
     this.top10Row = document.getElementById("top10Row");
+    this.top10PrevBtn = document.getElementById("top10PrevBtn");
+    this.top10NextBtn = document.getElementById("top10NextBtn");
     this.rowsContainer = document.getElementById("rowsContainer");
 
     // My List Section
@@ -124,6 +126,18 @@ class NetflixApp {
       this.brandLogo.addEventListener("click", (e) => {
         e.preventDefault();
         this.goHome();
+      });
+    }
+
+    // Top 10 Carousel Arrow Buttons
+    if (this.top10PrevBtn && this.top10Row) {
+      this.top10PrevBtn.addEventListener("click", () => {
+        this.top10Row.scrollBy({ left: -window.innerWidth * 0.7, behavior: "smooth" });
+      });
+    }
+    if (this.top10NextBtn && this.top10Row) {
+      this.top10NextBtn.addEventListener("click", () => {
+        this.top10Row.scrollBy({ left: window.innerWidth * 0.7, behavior: "smooth" });
       });
     }
 
@@ -489,6 +503,7 @@ class NetflixApp {
     if (this.top10Title && title) {
       this.top10Title.textContent = title;
     }
+    this.top10Row.scrollLeft = 0;
     this.top10Row.innerHTML = "";
     items.forEach((item, idx) => {
       const card = document.createElement("div");
