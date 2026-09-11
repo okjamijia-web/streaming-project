@@ -14,23 +14,48 @@ class NetflixApp {
 
   initElements() {
     // Nav
+    // Nav & Categories
     this.navbar = document.getElementById("navbar");
+    this.brandLogo = document.getElementById("brandLogo");
+    this.desktopNav = document.getElementById("desktopNav");
+    this.mobileCategoryBar = document.getElementById("mobileCategoryBar");
     this.searchInput = document.getElementById("searchInput");
     this.refreshTrendingBtn = document.getElementById("refreshTrendingBtn");
     this.searchResultsContainer = document.getElementById("searchResultsContainer");
     this.mainContent = document.getElementById("mainContent");
 
     // Hero
+    this.heroBillboard = document.getElementById("heroBillboard");
     this.heroBackdrop = document.getElementById("heroBackdrop");
     this.heroTitle = document.getElementById("heroTitle");
     this.heroOverview = document.getElementById("heroOverview");
+    this.heroTypeBadge = document.getElementById("heroTypeBadge");
     this.heroBadge = document.getElementById("heroBadge");
     this.heroPlayBtn = document.getElementById("heroPlayBtn");
     this.heroInfoBtn = document.getElementById("heroInfoBtn");
+    this.heroListBtn = document.getElementById("heroListBtn");
+    this.heroListBtnText = document.getElementById("heroListBtnText");
 
-    // Rows
+    // Rows & Sections
+    this.carouselRowsWrapper = document.getElementById("carouselRowsWrapper");
+    this.top10Section = document.getElementById("top10Section");
+    this.top10Title = document.getElementById("top10Title");
     this.top10Row = document.getElementById("top10Row");
     this.rowsContainer = document.getElementById("rowsContainer");
+
+    // My List Section
+    this.myListSection = document.getElementById("myListSection");
+    this.myListGrid = document.getElementById("myListGrid");
+    this.myListEmpty = document.getElementById("myListEmpty");
+    this.myListCounterBadge = document.getElementById("myListCounterBadge");
+    this.mobileMyListBadge = document.getElementById("mobileMyListBadge");
+    this.clearMyListBtn = document.getElementById("clearMyListBtn");
+    this.exploreHomeBtn = document.getElementById("exploreHomeBtn");
+
+    // State
+    this.currentCategory = "home";
+    this.myList = JSON.parse(localStorage.getItem("netflix_my_list") || "[]");
+    this.currentHeroItem = null;
 
     // Modal
     this.detailModal = document.getElementById("detailModal");
@@ -49,6 +74,8 @@ class NetflixApp {
     this.modalEpisodesList = document.getElementById("modalEpisodesList");
     this.modalSimilarGrid = document.getElementById("modalSimilarGrid");
     this.modalPlayBtn = document.getElementById("modalPlayBtn");
+    this.modalListBtn = document.getElementById("modalListBtn");
+    this.modalListBtnText = document.getElementById("modalListBtnText");
     this.closeModalBtn = document.getElementById("closeModalBtn");
 
     // Video Player & Switcher
@@ -85,7 +112,76 @@ class NetflixApp {
       }
     });
 
-        if (this.refreshTrendingBtn) {
+    // Logo Click -> Go Home
+    if (this.brandLogo) {
+      this.brandLogo.addEventListener("click", (e) => {
+        e.preventDefault();
+        this.goHome();
+      });
+    }
+
+    // Desktop Category Navigation
+    if (this.desktopNav) {
+      this.desktopNav.addEventListener("click", (e) => {
+        const link = e.target.closest("[data-category]");
+        if (!link) return;
+        e.preventDefault();
+        const cat = link.getAttribute("data-category");
+        this.switchCategory(cat);
+      });
+    }
+
+    // Mobile Subnav Category Bar
+    if (this.mobileCategoryBar) {
+      this.mobileCategoryBar.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-category]");
+        if (!btn) return;
+        e.preventDefault();
+        const cat = btn.getAttribute("data-category");
+        this.switchCategory(cat);
+      });
+    }
+
+    // Hero My List Toggle
+    if (this.heroListBtn) {
+      this.heroListBtn.addEventListener("click", () => {
+        if (this.currentHeroItem) {
+          this.toggleMyList(this.currentHeroItem);
+        }
+      });
+    }
+
+    // Modal My List Toggle
+    if (this.modalListBtn) {
+      this.modalListBtn.addEventListener("click", () => {
+        if (this.activeItem) {
+          this.toggleMyList(this.activeItem);
+        }
+      });
+    }
+
+    // Clear My List
+    if (this.clearMyListBtn) {
+      this.clearMyListBtn.addEventListener("click", () => {
+        if (confirm("Kosongkan semua film dan serial dari Daftar Saya?")) {
+          this.myList = [];
+          this.saveMyList();
+          this.updateMyListBadges();
+          this.updateHeroListBtn();
+          this.updateModalListBtn();
+          this.renderMyList();
+        }
+      });
+    }
+
+    // Explore Button from Empty My List
+    if (this.exploreHomeBtn) {
+      this.exploreHomeBtn.addEventListener("click", () => {
+        this.goHome();
+      });
+    }
+
+    if (this.refreshTrendingBtn) {
       this.refreshTrendingBtn.addEventListener("click", () => {
         const icon = this.refreshTrendingBtn.querySelector("i");
         if (icon) icon.classList.add("animate-spin");
@@ -147,27 +243,111 @@ class NetflixApp {
     try {
       const res = await fetch(`/api/catalog${force ? "?refresh=true" : ""}`);
       this.catalog = await res.json();
-      this.renderHero(this.catalog.hero);
-      this.renderTop10(this.catalog.top10);
-      this.renderRows(this.catalog.rows);
+      this.switchCategory(this.currentCategory || "home");
+      this.updateMyListBadges();
     } catch (err) {
       console.error("Failed to load catalog:", err);
     }
   }
 
-  renderHero(hero) {
+  goHome() {
+    if (this.searchInput) this.searchInput.value = "";
+    if (this.searchResultsContainer) {
+      this.searchResultsContainer.innerHTML = "";
+      this.searchResultsContainer.classList.add("hidden");
+    }
+    if (this.mainContent) this.mainContent.classList.remove("hidden");
+    this.closeModal();
+    this.closePlayer();
+    this.switchCategory("home");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  switchCategory(category) {
+    this.currentCategory = category;
+
+    // If search active, hide it and restore mainContent
+    if (this.searchResultsContainer && !this.searchResultsContainer.classList.contains("hidden")) {
+      if (this.searchInput) this.searchInput.value = "";
+      this.searchResultsContainer.innerHTML = "";
+      this.searchResultsContainer.classList.add("hidden");
+      this.mainContent.classList.remove("hidden");
+    }
+
+    // Update Desktop Navigation UI
+    if (this.desktopNav) {
+      this.desktopNav.querySelectorAll(".nav-link").forEach(link => {
+        const cat = link.getAttribute("data-category");
+        if (cat === category) {
+          link.className = "nav-link text-white font-bold border-b-2 border-netflixRed pb-1 transition cursor-pointer";
+        } else {
+          link.className = "nav-link text-gray-400 hover:text-white transition cursor-pointer";
+        }
+      });
+    }
+
+    // Update Mobile Subnav Category Bar UI
+    if (this.mobileCategoryBar) {
+      this.mobileCategoryBar.querySelectorAll(".mobile-nav-btn").forEach(btn => {
+        const cat = btn.getAttribute("data-category");
+        if (cat === category) {
+          btn.className = "mobile-nav-btn px-3.5 py-1.5 rounded-full border border-white bg-white text-black font-bold transition whitespace-nowrap cursor-pointer";
+        } else {
+          btn.className = "mobile-nav-btn px-3.5 py-1.5 rounded-full border border-gray-700 bg-black/40 text-gray-300 hover:text-white transition whitespace-nowrap cursor-pointer";
+        }
+      });
+    }
+
+    if (category === "mylist") {
+      // Display My List View
+      if (this.heroBillboard) this.heroBillboard.classList.add("hidden");
+      if (this.carouselRowsWrapper) this.carouselRowsWrapper.classList.add("hidden");
+      if (this.myListSection) this.myListSection.classList.remove("hidden");
+      this.renderMyList();
+    } else {
+      // Display Catalog Rows
+      if (this.heroBillboard) this.heroBillboard.classList.remove("hidden");
+      if (this.carouselRowsWrapper) this.carouselRowsWrapper.classList.remove("hidden");
+      if (this.myListSection) this.myListSection.classList.add("hidden");
+
+      if (this.catalog) {
+        const catData = (this.catalog.categories && this.catalog.categories[category])
+          ? this.catalog.categories[category]
+          : (this.catalog.categories && this.catalog.categories.home ? this.catalog.categories.home : this.catalog);
+
+        if (catData) {
+          this.renderHero(catData.hero, catData.heroTypeBadge);
+          this.renderTop10(catData.top10, catData.top10Title);
+          this.renderRows(catData.rows);
+        }
+      }
+    }
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (window.lucide) lucide.createIcons();
+  }
+
+  renderHero(hero, badge) {
     if (!hero) return;
-    this.heroBackdrop.src = hero.backdrop;
+    this.currentHeroItem = hero;
+    this.heroBackdrop.src = hero.backdrop || hero.poster;
     this.heroTitle.textContent = hero.title;
     this.heroOverview.textContent = hero.overview;
     this.heroBadge.textContent = `#${hero.top10 || 1} in Indonesia Today`;
+    if (this.heroTypeBadge) {
+      this.heroTypeBadge.textContent = badge || (hero.type === "series" ? "Netflix Series" : "Netflix Film");
+    }
 
     this.heroPlayBtn.onclick = () => this.openPlayer(hero);
-    this.heroInfoBtn.onclick = () => this.openModal(hero.id);
+    this.heroInfoBtn.onclick = () => this.openModal(hero.id, hero.type || "movie");
+    this.updateHeroListBtn();
   }
 
-  renderTop10(items) {
+  renderTop10(items, title) {
     if (!items || !this.top10Row) return;
+    if (this.top10Title && title) {
+      this.top10Title.textContent = title;
+    }
     this.top10Row.innerHTML = "";
     items.forEach((item, idx) => {
       const card = document.createElement("div");
@@ -185,6 +365,174 @@ class NetflixApp {
       card.onclick = () => this.openModal(item.id, item.type || "movie");
       this.top10Row.appendChild(card);
     });
+  }
+
+  isInMyList(id) {
+    return this.myList.some(item => item.id === id);
+  }
+
+  toggleMyList(item) {
+    if (!item) return;
+    const index = this.myList.findIndex(x => x.id === item.id);
+    if (index >= 0) {
+      this.myList.splice(index, 1);
+    } else {
+      this.myList.unshift({
+        id: item.id,
+        title: item.title,
+        poster: item.poster,
+        backdrop: item.backdrop || item.poster,
+        type: item.type || "movie",
+        match: item.match || "98% Match",
+        year: item.year || "2024",
+        duration: item.duration || (item.type === "series" ? "Series" : "Movie"),
+        rating: item.rating || "13+",
+        overview: item.overview || ""
+      });
+    }
+    this.saveMyList();
+    this.updateMyListBadges();
+    this.updateHeroListBtn();
+    this.updateModalListBtn();
+    if (this.currentCategory === "mylist") {
+      this.renderMyList();
+    }
+  }
+
+  saveMyList() {
+    try {
+      localStorage.setItem("netflix_my_list", JSON.stringify(this.myList));
+    } catch (e) {}
+  }
+
+  updateMyListBadges() {
+    const count = this.myList.length;
+    if (this.myListCounterBadge) {
+      this.myListCounterBadge.textContent = `${count} judul`;
+    }
+    if (this.mobileMyListBadge) {
+      if (count > 0) {
+        this.mobileMyListBadge.textContent = count;
+        this.mobileMyListBadge.classList.remove("hidden");
+      } else {
+        this.mobileMyListBadge.classList.add("hidden");
+      }
+    }
+    if (this.clearMyListBtn) {
+      if (count > 0) {
+        this.clearMyListBtn.classList.remove("hidden");
+      } else {
+        this.clearMyListBtn.classList.add("hidden");
+      }
+    }
+  }
+
+  updateHeroListBtn() {
+    if (!this.heroListBtn || !this.currentHeroItem) return;
+    const inList = this.isInMyList(this.currentHeroItem.id);
+    const icon = this.heroListBtn.querySelector("i");
+    if (icon) {
+      icon.setAttribute("data-lucide", inList ? "check" : "plus");
+    }
+    if (this.heroListBtnText) {
+      this.heroListBtnText.textContent = inList ? "In My List" : "My List";
+    }
+    if (inList) {
+      this.heroListBtn.classList.add("border-white", "bg-white/20");
+      this.heroListBtn.classList.remove("border-gray-500", "bg-black/60");
+    } else {
+      this.heroListBtn.classList.remove("border-white", "bg-white/20");
+      this.heroListBtn.classList.add("border-gray-500", "bg-black/60");
+    }
+    if (window.lucide) lucide.createIcons();
+  }
+
+  updateModalListBtn() {
+    if (!this.modalListBtn || !this.activeItem) return;
+    const inList = this.isInMyList(this.activeItem.id);
+    const icon = this.modalListBtn.querySelector("i");
+    if (icon) {
+      icon.setAttribute("data-lucide", inList ? "check" : "plus");
+    }
+    if (this.modalListBtnText) {
+      this.modalListBtnText.textContent = inList ? "In My List" : "My List";
+    }
+    if (inList) {
+      this.modalListBtn.classList.add("border-white", "bg-[#383838]");
+      this.modalListBtn.classList.remove("border-gray-400", "bg-[#2a2a2a]");
+    } else {
+      this.modalListBtn.classList.remove("border-white", "bg-[#383838]");
+      this.modalListBtn.classList.add("border-gray-400", "bg-[#2a2a2a]");
+    }
+    if (window.lucide) lucide.createIcons();
+  }
+
+  renderMyList() {
+    if (!this.myListGrid || !this.myListEmpty) return;
+    this.updateMyListBadges();
+
+    if (this.myList.length === 0) {
+      this.myListGrid.innerHTML = "";
+      this.myListEmpty.classList.remove("hidden");
+      return;
+    }
+
+    this.myListEmpty.classList.add("hidden");
+    this.myListGrid.innerHTML = this.myList.map(item => `
+      <div class="relative group rounded-md overflow-hidden bg-[#181818] shadow-lg cursor-pointer movie-card" data-id="${item.id}" data-type="${item.type || 'movie'}">
+        <div class="aspect-[2/3] w-full overflow-hidden relative">
+          <img src="${item.poster}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy" />
+          <button class="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/70 hover:bg-red-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-200 remove-from-list" data-id="${item.id}" title="Hapus dari Daftar Saya">
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+        <div class="p-2.5">
+          <h4 class="font-bold text-xs md:text-sm text-white truncate">${item.title}</h4>
+          <div class="flex items-center justify-between mt-1 text-[11px] text-gray-400">
+            <span class="text-green-400 font-bold">${item.match}</span>
+            <span>${item.year} · ${item.type === 'series' ? 'TV' : 'Movie'}</span>
+          </div>
+          <div class="flex items-center space-x-2 mt-2">
+            <button class="flex-1 bg-white hover:bg-gray-200 text-black text-xs font-bold py-1 rounded flex items-center justify-center space-x-1 play-my-list" data-id="${item.id}" data-type="${item.type || 'movie'}">
+              <i data-lucide="play" class="w-3 h-3 fill-current"></i>
+              <span>Play</span>
+            </button>
+            <button class="w-7 h-7 rounded bg-[#2a2a2a] hover:bg-[#333] text-white flex items-center justify-center info-my-list" data-id="${item.id}" data-type="${item.type || 'movie'}">
+              <i data-lucide="info" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    `).join("");
+
+    this.myListGrid.querySelectorAll(".remove-from-list").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const id = btn.getAttribute("data-id");
+        const found = this.myList.find(x => x.id === id);
+        if (found) this.toggleMyList(found);
+      });
+    });
+
+    this.myListGrid.querySelectorAll(".play-my-list").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const id = btn.getAttribute("data-id");
+        const item = this.myList.find(x => x.id === id);
+        if (item) this.openPlayer(item);
+      });
+    });
+
+    this.myListGrid.querySelectorAll(".info-my-list, .movie-card").forEach(el => {
+      el.addEventListener("click", (e) => {
+        if (e.target.closest(".remove-from-list") || e.target.closest(".play-my-list")) return;
+        const id = el.getAttribute("data-id");
+        const type = el.getAttribute("data-type") || "movie";
+        this.openModal(id, type);
+      });
+    });
+
+    if (window.lucide) lucide.createIcons();
   }
 
   renderRows(rows) {
@@ -236,12 +584,13 @@ class NetflixApp {
       rowDiv.querySelectorAll(".movie-card").forEach(c => {
         c.onclick = (e) => {
           const id = c.getAttribute("data-id");
+          const type = c.getAttribute("data-type") || "movie";
           if (e.target.closest(".play-quick")) {
             e.stopPropagation();
-            const item = this.catalog.trending.find(x => x.id === id);
-            this.openPlayer(item);
+            const title = c.querySelector("h4") ? c.querySelector("h4").textContent : "Playing";
+            this.openPlayer({ id, type, title });
           } else {
-            this.openModal(id);
+            this.openModal(id, type);
           }
         };
       });
@@ -384,6 +733,7 @@ class NetflixApp {
         `).join("");
       }
 
+      this.updateModalListBtn();
       this.detailModal.classList.remove("hidden");
       document.body.classList.add("overflow-hidden");
       if (window.lucide) lucide.createIcons();

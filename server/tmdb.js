@@ -46,12 +46,14 @@ class TmdbService {
 
     try {
       // Fetch live real-time trending feeds from Cinemeta
-      const [topMoviesRes, topSeriesRes, actionRes, animationRes, scifiRes] = await Promise.allSettled([
+      const [topMoviesRes, topSeriesRes, actionRes, animationRes, scifiRes, actionSeriesRes, dramaSeriesRes] = await Promise.allSettled([
         fetch(`${this.cinemetaBase}/catalog/movie/top.json`).then(r => r.json()),
         fetch(`${this.cinemetaBase}/catalog/series/top.json`).then(r => r.json()),
         fetch(`${this.cinemetaBase}/catalog/movie/top/genre=Action.json`).then(r => r.json()),
         fetch(`${this.cinemetaBase}/catalog/movie/top/genre=Animation.json`).then(r => r.json()),
-        fetch(`${this.cinemetaBase}/catalog/movie/top/genre=Sci-Fi.json`).then(r => r.json())
+        fetch(`${this.cinemetaBase}/catalog/movie/top/genre=Sci-Fi.json`).then(r => r.json()),
+        fetch(`${this.cinemetaBase}/catalog/series/top/genre=Action.json`).then(r => r.json()),
+        fetch(`${this.cinemetaBase}/catalog/series/top/genre=Drama.json`).then(r => r.json())
       ]);
 
       const formatMeta = (m, type = "movie") => ({
@@ -90,8 +92,18 @@ class TmdbService {
         ? scifiRes.value.metas.map(m => formatMeta(m, "movie"))
         : [];
 
-      // Top 10 Today
+      const actionSeries = (actionSeriesRes.status === "fulfilled" && actionSeriesRes.value && actionSeriesRes.value.metas)
+        ? actionSeriesRes.value.metas.map(m => formatMeta(m, "series"))
+        : [];
+
+      const dramaSeries = (dramaSeriesRes.status === "fulfilled" && dramaSeriesRes.value && dramaSeriesRes.value.metas)
+        ? dramaSeriesRes.value.metas.map(m => formatMeta(m, "series"))
+        : [];
+
+      // Top 10 lists
       const top10 = topMovies.slice(0, 10).map((item, idx) => ({ ...item, top10: idx + 1 }));
+      const seriesTop10 = topSeries.slice(0, 10).map((item, idx) => ({ ...item, top10: idx + 1 }));
+      const moviesTop10 = topMovies.slice(0, 10).map((item, idx) => ({ ...item, top10: idx + 1 }));
 
       // Fetch detail for top 3 items to get high-res backdrops and full overviews
       const heroPool = [];
@@ -102,22 +114,81 @@ class TmdbService {
         } catch (e) {}
       }
       if (heroPool.length === 0) heroPool.push(top10[0]);
-
       const heroItem = heroPool[Math.floor(Math.random() * heroPool.length)];
+
+      // Series Hero
+      let seriesHero = topSeries[0] || heroItem;
+      try {
+        if (topSeries[0]) {
+          const sDetail = await this.getDetail(topSeries[0].id, "series");
+          if (sDetail) seriesHero = sDetail;
+        }
+      } catch (e) {}
+
+      // Movies Hero
+      let movieHero = heroItem;
 
       const rows = [
         { id: "trending-movies", title: "🔥 Trending Movies Hari Ini", items: topMovies.slice(0, 15) },
         { id: "popular-series", title: "📺 Serial TV Terpopuler & Baru", items: topSeries.slice(0, 15) },
         { id: "action-blockbusters", title: "💥 Action & Petualangan Pilihan", items: actionMovies.slice(0, 15) },
+        { id: "drama-series", title: "🎭 Drama & Misteri Unggulan", items: dramaSeries.slice(0, 15) },
         { id: "scifi-hits", title: "🚀 Sci-Fi & Fantasi Spektakuler", items: scifiMovies.slice(0, 15) },
         { id: "animation-anime", title: "🍿 Animasi & Anime", items: animationMovies.slice(0, 15) }
       ].filter(r => r.items.length > 0);
+
+      // Pre-packaged category views for instant tab switching
+      const categories = {
+        home: {
+          hero: heroItem,
+          heroTypeBadge: heroItem.type === "series" ? "Netflix Series" : "Netflix Film",
+          top10: top10,
+          top10Title: "Top 10 Tayangan Hari Ini di Indonesia",
+          rows: rows
+        },
+        series: {
+          hero: seriesHero,
+          heroTypeBadge: "Netflix Series",
+          top10: seriesTop10,
+          top10Title: "Top 10 Serial TV Hari Ini di Indonesia",
+          rows: [
+            { id: "trending-series", title: "📺 Serial TV Terpopuler Hari Ini", items: topSeries.slice(0, 15) },
+            { id: "action-series", title: "💥 Serial Aksi & Ketegangan Tinggi", items: actionSeries.slice(0, 15) },
+            { id: "drama-series", title: "🎭 Serial Drama, Romansa & Misteri", items: dramaSeries.slice(0, 15) },
+            { id: "binge-series", title: "🍿 Serial Pilihan Terbaik untuk Binge-Watching", items: topSeries.slice(10, 25) }
+          ].filter(r => r.items.length > 0)
+        },
+        movies: {
+          hero: movieHero,
+          heroTypeBadge: "Netflix Film",
+          top10: moviesTop10,
+          top10Title: "Top 10 Film Hari Ini di Indonesia",
+          rows: [
+            { id: "trending-movies", title: "🔥 Film Box Office Terpopuler", items: topMovies.slice(0, 15) },
+            { id: "action-movies", title: "💥 Film Laga & Aksi Spektakuler", items: actionMovies.slice(0, 15) },
+            { id: "scifi-movies", title: "🚀 Petualangan Fiksi Ilmiah & Fantasi", items: scifiMovies.slice(0, 15) },
+            { id: "animation-movies", title: "🍿 Film Animasi & Cerita Keluarga", items: animationMovies.slice(0, 15) }
+          ].filter(r => r.items.length > 0)
+        },
+        popular: {
+          hero: heroItem,
+          heroTypeBadge: "Top Trending Global",
+          top10: top10,
+          top10Title: "Top 10 Paling Banyak Ditonton Minggu Ini",
+          rows: [
+            { id: "popular-now", title: "🔥 Paling Ramai Dibicarakan Saat Ini", items: [...topMovies.slice(0, 8), ...topSeries.slice(0, 8)] },
+            { id: "fresh-movies", title: "✨ Rilis Baru Pilihan di Netflix", items: topMovies.slice(5, 20) },
+            { id: "fresh-series", title: "🌟 Serial TV Terbaru yang Wajib Ditonton", items: topSeries.slice(5, 20) }
+          ].filter(r => r.items.length > 0)
+        }
+      };
 
       this.catalogCache = {
         hero: heroItem,
         top10: top10,
         topTrending: heroPool,
         rows: rows,
+        categories: categories,
         lastUpdated: new Date().toISOString()
       };
       this.lastCatalogFetch = now;

@@ -36,15 +36,15 @@
   <!-- ================= NAVBAR ================= -->
   <nav id="navbar" class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 md:px-12 py-3 bg-gradient-to-b from-black/80 to-transparent transition duration-500">
     <div class="flex items-center space-x-6 md:space-x-10">
-      <a href="#" class="text-netflixRed text-2xl md:text-3xl font-extrabold tracking-tighter uppercase font-serif">
+      <a href="#" id="brandLogo" class="text-netflixRed text-2xl md:text-3xl font-extrabold tracking-tighter uppercase font-serif cursor-pointer hover:opacity-90 transition">
         NETFLIX
       </a>
-      <ul class="hidden md:flex items-center space-x-5 text-sm text-gray-300 font-medium">
-        <li><a href="#" class="text-white font-bold hover:text-white transition">Home</a></li>
-        <li><a href="#" class="hover:text-gray-400 transition">TV Shows</a></li>
-        <li><a href="#" class="hover:text-gray-400 transition">Movies</a></li>
-        <li><a href="#" class="hover:text-gray-400 transition">New & Popular</a></li>
-        <li><a href="#" class="hover:text-gray-400 transition">My List</a></li>
+      <ul id="desktopNav" class="hidden md:flex items-center space-x-5 text-sm text-gray-300 font-medium">
+        <li><a href="#" class="nav-link text-white font-bold transition cursor-pointer" data-category="home">Home</a></li>
+        <li><a href="#" class="nav-link text-gray-400 hover:text-white transition cursor-pointer" data-category="series">TV Shows</a></li>
+        <li><a href="#" class="nav-link text-gray-400 hover:text-white transition cursor-pointer" data-category="movies">Movies</a></li>
+        <li><a href="#" class="nav-link text-gray-400 hover:text-white transition cursor-pointer" data-category="popular">New & Popular</a></li>
+        <li><a href="#" class="nav-link text-gray-400 hover:text-white transition cursor-pointer" data-category="mylist">My List</a></li>
       </ul>
     </div>
 
@@ -75,6 +75,18 @@
     </div>
   </nav>
 
+  <!-- ================= MOBILE CATEGORY BAR ================= -->
+  <div id="mobileCategoryBar" class="flex md:hidden items-center space-x-2 px-4 py-2.5 bg-black/90 backdrop-blur border-b border-gray-800/80 sticky top-14 z-40 overflow-x-auto hide-scrollbar text-xs font-semibold">
+    <button class="mobile-nav-btn px-3.5 py-1.5 rounded-full border border-white bg-white text-black font-bold transition whitespace-nowrap cursor-pointer" data-category="home">Home</button>
+    <button class="mobile-nav-btn px-3.5 py-1.5 rounded-full border border-gray-700 bg-black/40 text-gray-300 hover:text-white transition whitespace-nowrap cursor-pointer" data-category="series">TV Shows</button>
+    <button class="mobile-nav-btn px-3.5 py-1.5 rounded-full border border-gray-700 bg-black/40 text-gray-300 hover:text-white transition whitespace-nowrap cursor-pointer" data-category="movies">Movies</button>
+    <button class="mobile-nav-btn px-3.5 py-1.5 rounded-full border border-gray-700 bg-black/40 text-gray-300 hover:text-white transition whitespace-nowrap cursor-pointer" data-category="popular">New & Popular</button>
+    <button class="mobile-nav-btn px-3.5 py-1.5 rounded-full border border-gray-700 bg-black/40 text-gray-300 hover:text-white transition whitespace-nowrap flex items-center space-x-1 cursor-pointer" data-category="mylist">
+      <span>My List</span>
+      <span id="mobileMyListBadge" class="hidden text-[10px] bg-netflixRed text-white px-1.5 py-0.2 rounded-full font-bold ml-1">0</span>
+    </button>
+  </div>
+
   <!-- ================= SEARCH RESULTS ================= -->
   <div id="searchResultsContainer" class="hidden min-h-screen"></div>
 
@@ -82,12 +94,12 @@
   <main id="mainContent" class="relative">
     
     <!-- HERO BILLBOARD -->
-    <div class="relative h-[70vh] md:h-[85vh] w-full overflow-hidden">
+    <div id="heroBillboard" class="relative h-[70vh] md:h-[85vh] w-full overflow-hidden">
       <img id="heroBackdrop" src="" alt="Hero Backdrop" class="w-full h-full object-cover object-center" />
       <div class="absolute inset-0 hero-vignette flex flex-col justify-center px-4 md:px-12 pb-16">
         <div class="max-w-2xl">
           <div class="flex items-center space-x-2 mb-3">
-            <span class="bg-netflixRed text-white text-[10px] md:text-xs font-bold px-2 py-0.5 rounded tracking-wider uppercase">Netflix Series</span>
+            <span id="heroTypeBadge" class="bg-netflixRed text-white text-[10px] md:text-xs font-bold px-2 py-0.5 rounded tracking-wider uppercase">Netflix Series</span>
             <span id="heroBadge" class="text-xs md:text-sm font-bold text-gray-200"></span>
           </div>
 
@@ -100,32 +112,62 @@
           </p>
 
           <div class="flex items-center space-x-3">
-            <button id="heroPlayBtn" class="flex items-center space-x-2 bg-white hover:bg-gray-200 text-black px-5 md:px-8 py-2 md:py-2.5 rounded font-bold text-sm md:text-base transition duration-300 shadow">
+            <button id="heroPlayBtn" class="flex items-center space-x-2 bg-white hover:bg-gray-200 text-black px-5 md:px-8 py-2 md:py-2.5 rounded font-bold text-sm md:text-base transition duration-300 shadow cursor-pointer">
               <i data-lucide="play" class="w-5 h-5 fill-current"></i>
               <span>Play</span>
             </button>
-            <button id="heroInfoBtn" class="flex items-center space-x-2 bg-gray-500/60 hover:bg-gray-500/40 text-white px-5 md:px-7 py-2 md:py-2.5 rounded font-bold text-sm md:text-base transition duration-300 backdrop-blur-sm">
+            <button id="heroInfoBtn" class="flex items-center space-x-2 bg-gray-500/60 hover:bg-gray-500/40 text-white px-5 md:px-7 py-2 md:py-2.5 rounded font-bold text-sm md:text-base transition duration-300 backdrop-blur-sm cursor-pointer">
               <i data-lucide="info" class="w-5 h-5"></i>
               <span>More Info</span>
+            </button>
+            <button id="heroListBtn" class="flex items-center space-x-2 bg-black/60 hover:bg-black/80 border border-gray-500 hover:border-white text-white px-4 md:px-5 py-2 md:py-2.5 rounded font-bold text-sm md:text-base transition duration-300 cursor-pointer" title="Tambah ke Daftar Saya">
+              <i data-lucide="plus" class="w-5 h-5"></i>
+              <span id="heroListBtnText" class="hidden sm:inline">My List</span>
             </button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- CAROUSEL ROWS -->
-    <div class="-mt-16 md:-mt-24 relative z-20 pb-20">
+    <!-- CAROUSEL ROWS CONTAINER -->
+    <div id="carouselRowsWrapper" class="-mt-16 md:-mt-24 relative z-20 pb-20">
       
       <!-- TOP 10 ROW -->
-      <div class="relative mb-8 group">
-        <h2 class="text-lg md:text-xl lg:text-2xl font-bold mb-3 px-4 md:px-12 text-gray-100 flex items-center space-x-2">
-          <span>Top 10 Movies Today in Indonesia</span>
+      <div id="top10Section" class="relative mb-8 group">
+        <h2 id="top10Title" class="text-lg md:text-xl lg:text-2xl font-bold mb-3 px-4 md:px-12 text-gray-100 flex items-center space-x-2">
+          Top 10 Tayangan Hari Ini di Indonesia
         </h2>
         <div id="top10Row" class="flex items-center space-x-4 md:space-x-6 overflow-x-auto hide-scrollbar px-4 md:px-12 py-4"></div>
       </div>
 
       <!-- DYNAMIC ROWS -->
       <div id="rowsContainer"></div>
+    </div>
+
+    <!-- ================= MY LIST VIEW ================= -->
+    <div id="myListSection" class="hidden px-4 md:px-12 pt-28 pb-20 min-h-[80vh]">
+      <div class="flex items-center justify-between mb-6 border-b border-gray-800 pb-4">
+        <h1 class="text-2xl md:text-3xl font-extrabold text-white flex items-center space-x-3">
+          <span>Daftar Saya (My List)</span>
+          <span id="myListCounterBadge" class="text-xs bg-netflixRed text-white px-2.5 py-0.5 rounded-full font-bold">0 judul</span>
+        </h1>
+        <button id="clearMyListBtn" class="text-xs text-gray-400 hover:text-red-400 transition underline cursor-pointer hidden">
+          Kosongkan Daftar
+        </button>
+      </div>
+      <div id="myListGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-5"></div>
+      <div id="myListEmpty" class="hidden flex flex-col items-center justify-center py-24 text-center">
+        <div class="w-16 h-16 rounded-full bg-[#222] border border-gray-700 flex items-center justify-center text-gray-400 mb-4">
+          <i data-lucide="bookmark-plus" class="w-8 h-8 text-netflixRed"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-100 mb-2">Daftar Anda Masih Kosong</h3>
+        <p class="text-sm text-gray-400 max-w-md mb-6 leading-relaxed">
+          Simpan film dan serial TV favorit Anda dengan mengklik tombol <b>+ My List</b> agar mudah ditonton kapan saja.
+        </p>
+        <button id="exploreHomeBtn" class="bg-white hover:bg-gray-200 text-black font-bold text-sm px-6 py-2.5 rounded transition shadow cursor-pointer">
+          Jelajahi Film & Serial Sekarang
+        </button>
+      </div>
     </div>
   </main>
 
@@ -139,9 +181,13 @@
         <div class="absolute inset-0 modal-backdrop-gradient flex flex-col justify-end p-6 md:p-10">
           <h2 id="modalTitle" class="text-2xl md:text-4xl font-extrabold mb-4 drop-shadow"></h2>
           <div class="flex items-center space-x-3">
-            <button id="modalPlayBtn" class="flex items-center space-x-2 bg-white hover:bg-gray-200 text-black px-6 py-2 rounded font-bold text-sm transition">
+            <button id="modalPlayBtn" class="flex items-center space-x-2 bg-white hover:bg-gray-200 text-black px-6 py-2 rounded font-bold text-sm transition cursor-pointer">
               <i data-lucide="play" class="w-4 h-4 fill-current"></i>
               <span>Play</span>
+            </button>
+            <button id="modalListBtn" class="flex items-center space-x-2 bg-[#2a2a2a] hover:bg-[#333] border border-gray-400 hover:border-white text-white px-4 py-2 rounded font-semibold text-sm transition cursor-pointer" title="Tambah ke Daftar Saya">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span id="modalListBtnText">My List</span>
             </button>
           </div>
         </div>
