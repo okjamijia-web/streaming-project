@@ -1,4 +1,6 @@
-﻿# Panduan Lengkap Home Streaming Server (Jellyfin + Radarr + Sonarr)
+# Netflix Clone + Stremio Streaming Web App
+
+Web aplikasi streaming modern dengan antarmuka Netflix dan backend Stremio resolver. Siap dideploy di Vercel dan dijalankan secara lokal.
 
 ## Status Layanan di Komputer Anda
 Semua aplikasi telah terpasang dan **sedang aktif berjalan**:
