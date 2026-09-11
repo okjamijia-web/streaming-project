@@ -1,4 +1,4 @@
-﻿const fallbackData = {
+const fallbackData = {
   trending: [
     {
       id: "mov-1",

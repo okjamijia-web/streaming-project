@@ -1,4 +1,4 @@
-﻿// Netflix Frontend Application Controller
+// Netflix Frontend Application Controller
 class NetflixApp {
   constructor() {
     this.catalog = null;

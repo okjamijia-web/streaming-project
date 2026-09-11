@@ -1,4 +1,4 @@
-﻿const tmdb = require("./tmdb");
+const tmdb = require("./tmdb");
 
 class StremioService {
   constructor() {
