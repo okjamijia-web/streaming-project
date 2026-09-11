@@ -1,4 +1,4 @@
-﻿const express = require("express");
+const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const tmdb = require("./tmdb");
@@ -64,15 +64,25 @@ app.get("/api/subtitles/:lang", (req, res) => {
 
 // SPA Fallback
 app.use((req, res) => {
-  res.sendFile(path.join(__dirname, "../public/index.html"));
+  const fs = require("fs");
+  const indexPath = path.join(__dirname, "../public/index.html");
+  if (fs.existsSync(indexPath)) {
+    return res.sendFile(indexPath);
+  }
+  res.status(404).json({ error: "Endpoint not found" });
 });
 
-app.listen(PORT, () => {
-  console.log(`=======================================================`);
-  console.log(`🎬 NETFLIX UI + STREMIO BACKEND SERVER IS RUNNING!`);
-  console.log(`🌐 Web URL: http://localhost:${PORT}`);
-  console.log(`=======================================================`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`=======================================================`);
+    console.log(`🎬 NETFLIX UI + STREMIO BACKEND SERVER IS RUNNING!`);
+    console.log(`🌐 Web URL: http://localhost:${PORT}`);
+    console.log(`=======================================================`);
+  });
+}
+
+module.exports = app;
+
 
 
 
