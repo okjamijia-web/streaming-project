@@ -75,6 +75,7 @@ class NetflixApp {
     this.modalRating = document.getElementById("modalRating");
     this.modalDuration = document.getElementById("modalDuration");
     this.modalQuality = document.getElementById("modalQuality");
+    this.modalPlatform = document.getElementById("modalPlatform");
     this.modalOverview = document.getElementById("modalOverview");
     this.modalCast = document.getElementById("modalCast");
     this.modalGenres = document.getElementById("modalGenres");
@@ -709,11 +710,24 @@ class NetflixApp {
             ${row.items.map(item => `
               <div class="flex-none w-36 md:w-48 lg:w-56 h-52 md:h-72 lg:h-80 rounded-md overflow-hidden relative shadow-md cursor-pointer movie-card" data-id="${item.id}" data-type="${item.type || "movie"}">
                 <img src="${item.poster}" alt="${item.title}" class="w-full h-full object-cover rounded-md" loading="lazy" />
+                ${item.platform ? `
+                  <div class="absolute top-2 left-2 z-10 pointer-events-none">
+                    <span class="text-[9px] md:text-[10px] font-extrabold px-1.5 py-0.5 rounded shadow-md tracking-wider uppercase ${
+                      item.platform === 'Netflix' ? 'bg-[#E50914] text-white' :
+                      item.platform === 'Disney+' ? 'bg-[#113CCF] text-white' :
+                      item.platform === 'Prime Video' ? 'bg-[#00A8E1] text-black font-black' :
+                      item.platform === 'Apple TV+' ? 'bg-black/90 border border-gray-500 text-white' :
+                      item.platform === 'HBO Max' ? 'bg-[#5822B4] text-white' :
+                      'bg-gray-800 text-white'
+                    }">${item.platform}</span>
+                  </div>
+                ` : ''}
                 <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 hover:opacity-100 transition duration-300 flex flex-col justify-end p-3">
                   <h4 class="font-bold text-sm line-clamp-1">${item.title}</h4>
                   <div class="flex items-center space-x-2 mt-1">
                     <span class="text-xs text-green-400 font-bold">${item.match}</span>
                     <span class="text-[10px] border border-gray-400 px-1 rounded">${item.rating}</span>
+                    ${item.platform ? `<span class="text-[10px] text-gray-300 font-semibold">${item.platform}</span>` : ''}
                   </div>
                   <div class="flex items-center space-x-2 mt-2">
                     <button class="w-7 h-7 rounded-full bg-white text-black flex items-center justify-center hover:bg-gray-200 play-quick" data-id="${item.id}" data-type="${item.type || "movie"}">
@@ -822,6 +836,21 @@ class NetflixApp {
       this.modalRating.textContent = item.rating;
       this.modalDuration.textContent = item.duration;
       this.modalQuality.textContent = item.quality || "4K Ultra HD";
+      if (this.modalPlatform) {
+        if (item.platform) {
+          this.modalPlatform.textContent = item.platform;
+          let badgeClass = "text-white bg-gray-800";
+          if (item.platform === "Netflix") badgeClass = "bg-[#E50914] text-white";
+          else if (item.platform === "Disney+") badgeClass = "bg-[#113CCF] text-white";
+          else if (item.platform === "Prime Video") badgeClass = "bg-[#00A8E1] text-black font-black";
+          else if (item.platform === "Apple TV+") badgeClass = "bg-black border border-gray-500 text-white";
+          else if (item.platform === "HBO Max") badgeClass = "bg-[#5822B4] text-white";
+          this.modalPlatform.className = `text-[10px] font-bold px-2 py-0.5 rounded tracking-wide uppercase ${badgeClass}`;
+          this.modalPlatform.classList.remove("hidden");
+        } else {
+          this.modalPlatform.classList.add("hidden");
+        }
+      }
       this.modalOverview.textContent = item.overview;
       this.modalCast.textContent = item.cast ? item.cast.join(", ") : "-";
       this.modalGenres.textContent = item.genres ? item.genres.join(", ") : "-";

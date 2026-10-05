@@ -23,12 +23,150 @@ const fallbackData = {
   categories: []
 };
 
+
+const platformSeeds = {
+  netflix: [
+    { id: "tt4574334", type: "series", title: "Stranger Things", platform: "Netflix", poster: "https://images.metahub.space/poster/medium/tt4574334/img.jpg" },
+    { id: "tt13443472", type: "series", title: "Wednesday", platform: "Netflix", poster: "https://images.metahub.space/poster/medium/tt13443472/img.jpg" },
+    { id: "tt10919420", type: "series", title: "Squid Game", platform: "Netflix", poster: "https://images.metahub.space/poster/medium/tt10919420/img.jpg" },
+    { id: "tt11737520", type: "series", title: "One Piece", platform: "Netflix", poster: "https://images.metahub.space/poster/medium/tt11737520/img.jpg" },
+    { id: "tt8740790", type: "series", title: "Bridgerton", platform: "Netflix", poster: "https://images.metahub.space/poster/medium/tt8740790/img.jpg" },
+    { id: "tt13016388", type: "series", title: "3 Body Problem", platform: "Netflix", poster: "https://images.metahub.space/poster/medium/tt13016388/img.jpg" },
+    { id: "tt9018736", type: "series", title: "Avatar: The Last Airbender", platform: "Netflix", poster: "https://images.metahub.space/poster/medium/tt9018736/img.jpg" },
+    { id: "tt11301886", type: "movie", title: "Rebel Ridge", platform: "Netflix", poster: "https://images.metahub.space/poster/medium/tt11301886/img.jpg" },
+    { id: "tt12263384", type: "movie", title: "Extraction II", platform: "Netflix", poster: "https://images.metahub.space/poster/medium/tt12263384/img.jpg" },
+    { id: "tt11564570", type: "movie", title: "Glass Onion: A Knives Out Mystery", platform: "Netflix", poster: "https://images.metahub.space/poster/medium/tt11564570/img.jpg" },
+    { id: "tt7991608", type: "movie", title: "Red Notice", platform: "Netflix", poster: "https://images.metahub.space/poster/medium/tt7991608/img.jpg" },
+    { id: "tt12747748", type: "movie", title: "Leave the World Behind", platform: "Netflix", poster: "https://images.metahub.space/poster/medium/tt12747748/img.jpg" }
+  ],
+  disney: [
+    { id: "tt8111088", type: "series", title: "The Mandalorian", platform: "Disney+", poster: "https://images.metahub.space/poster/medium/tt8111088/img.jpg" },
+    { id: "tt9140554", type: "series", title: "Loki", platform: "Disney+", poster: "https://images.metahub.space/poster/medium/tt9140554/img.jpg" },
+    { id: "tt2788310", type: "series", title: "Shōgun", platform: "Disney+", poster: "https://images.metahub.space/poster/medium/tt2788310/img.jpg" },
+    { id: "tt14452776", type: "series", title: "The Bear", platform: "Disney+", poster: "https://images.metahub.space/poster/medium/tt14452776/img.jpg" },
+    { id: "tt6263850", type: "movie", title: "Deadpool & Wolverine", platform: "Disney+", poster: "https://images.metahub.space/poster/medium/tt6263850/img.jpg" },
+    { id: "tt22022452", type: "movie", title: "Inside Out 2", platform: "Disney+", poster: "https://images.metahub.space/poster/medium/tt22022452/img.jpg" },
+    { id: "tt3521164", type: "movie", title: "Moana", platform: "Disney+", poster: "https://images.metahub.space/poster/medium/tt3521164/img.jpg" },
+    { id: "tt4154796", type: "movie", title: "Avengers: Endgame", platform: "Disney+", poster: "https://images.metahub.space/poster/medium/tt4154796/img.jpg" },
+    { id: "tt6791350", type: "movie", title: "Guardians of the Galaxy Vol. 3", platform: "Disney+", poster: "https://images.metahub.space/poster/medium/tt6791350/img.jpg" },
+    { id: "tt1630029", type: "movie", title: "Avatar: The Way of Water", platform: "Disney+", poster: "https://images.metahub.space/poster/medium/tt1630029/img.jpg" },
+    { id: "tt12324366", type: "series", title: "Percy Jackson and the Olympians", platform: "Disney+", poster: "https://images.metahub.space/poster/medium/tt12324366/img.jpg" },
+    { id: "tt9253284", type: "series", title: "Andor", platform: "Disney+", poster: "https://images.metahub.space/poster/medium/tt9253284/img.jpg" }
+  ],
+  prime: [
+    { id: "tt1190634", type: "series", title: "The Boys", platform: "Prime Video", poster: "https://images.metahub.space/poster/medium/tt1190634/img.jpg" },
+    { id: "tt12637874", type: "series", title: "Fallout", platform: "Prime Video", poster: "https://images.metahub.space/poster/medium/tt12637874/img.jpg" },
+    { id: "tt7631058", type: "series", title: "The Lord of the Rings: The Rings of Power", platform: "Prime Video", poster: "https://images.metahub.space/poster/medium/tt7631058/img.jpg" },
+    { id: "tt9288030", type: "series", title: "Reacher", platform: "Prime Video", poster: "https://images.metahub.space/poster/medium/tt9288030/img.jpg" },
+    { id: "tt6741278", type: "series", title: "Invincible", platform: "Prime Video", poster: "https://images.metahub.space/poster/medium/tt6741278/img.jpg" },
+    { id: "tt13110632", type: "series", title: "Gen V", platform: "Prime Video", poster: "https://images.metahub.space/poster/medium/tt13110632/img.jpg" },
+    { id: "tt3359350", type: "movie", title: "Road House", platform: "Prime Video", poster: "https://images.metahub.space/poster/medium/tt3359350/img.jpg" },
+    { id: "tt9466144", type: "movie", title: "The Idea of You", platform: "Prime Video", poster: "https://images.metahub.space/poster/medium/tt9466144/img.jpg" },
+    { id: "tt15314262", type: "movie", title: "The Beekeeper", platform: "Prime Video", poster: "https://images.metahub.space/poster/medium/tt15314262/img.jpg" },
+    { id: "tt17351924", type: "movie", title: "Saltburn", platform: "Prime Video", poster: "https://images.metahub.space/poster/medium/tt17351924/img.jpg" },
+    { id: "tt16419074", type: "movie", title: "AIR", platform: "Prime Video", poster: "https://images.metahub.space/poster/medium/tt16419074/img.jpg" },
+    { id: "tt10230602", type: "series", title: "Citadel", platform: "Prime Video", poster: "https://images.metahub.space/poster/medium/tt10230602/img.jpg" }
+  ],
+  apple_hbo: [
+    { id: "tt11198330", type: "series", title: "House of the Dragon", platform: "HBO Max", poster: "https://images.metahub.space/poster/medium/tt11198330/img.jpg" },
+    { id: "tt3581920", type: "series", title: "The Last of Us", platform: "HBO Max", poster: "https://images.metahub.space/poster/medium/tt3581920/img.jpg" },
+    { id: "tt15474916", type: "series", title: "The Penguin", platform: "HBO Max", poster: "https://images.metahub.space/poster/medium/tt15474916/img.jpg" },
+    { id: "tt11280740", type: "series", title: "Severance", platform: "Apple TV+", poster: "https://images.metahub.space/poster/medium/tt11280740/img.jpg" },
+    { id: "tt10986410", type: "series", title: "Ted Lasso", platform: "Apple TV+", poster: "https://images.metahub.space/poster/medium/tt10986410/img.jpg" },
+    { id: "tt14688458", type: "series", title: "Silo", platform: "Apple TV+", poster: "https://images.metahub.space/poster/medium/tt14688458/img.jpg" },
+    { id: "tt15239678", type: "movie", title: "Dune: Part Two", platform: "HBO Max", poster: "https://images.metahub.space/poster/medium/tt15239678/img.jpg" },
+    { id: "tt1877830", type: "movie", title: "The Batman", platform: "HBO Max", poster: "https://images.metahub.space/poster/medium/tt1877830/img.jpg" },
+    { id: "tt1517268", type: "movie", title: "Barbie", platform: "HBO Max", poster: "https://images.metahub.space/poster/medium/tt1517268/img.jpg" },
+    { id: "tt5537002", type: "movie", title: "Killers of the Flower Moon", platform: "Apple TV+", poster: "https://images.metahub.space/poster/medium/tt5537002/img.jpg" },
+    { id: "tt13287846", type: "movie", title: "Napoleon", platform: "Apple TV+", poster: "https://images.metahub.space/poster/medium/tt13287846/img.jpg" },
+    { id: "tt10751238", type: "series", title: "Slow Horses", platform: "Apple TV+", poster: "https://images.metahub.space/poster/medium/tt10751238/img.jpg" }
+  ]
+};
+
+const platformSeedMap = {};
+Object.values(platformSeeds).flat().forEach(item => {
+  platformSeedMap[item.id] = item;
+});
+
 class TmdbService {
   constructor() {
     this.fallback = fallbackData;
     this.cinemetaBase = "https://v3-cinemeta.strem.io";
     this.catalogCache = null;
     this.lastCatalogFetch = 0;
+    this.platformCache = null;
+    this.lastPlatformFetch = 0;
+  }
+
+  
+  async getPlatformCatalogs() {
+    if (this.platformCache && (Date.now() - this.lastPlatformFetch < 6 * 3600 * 1000)) {
+      return this.platformCache;
+    }
+
+    const fetchList = async (seedList) => {
+      const promises = seedList.map(async (seed) => {
+        try {
+          const res = await fetch(`${this.cinemetaBase}/meta/${seed.type}/${seed.id}.json`).then(r => r.json());
+          if (res && res.meta) {
+            const m = res.meta;
+            return {
+              id: m.id || seed.id,
+              imdbId: m.id || seed.id,
+              tmdbId: m.moviedb_id || null,
+              title: m.name || seed.title,
+              type: m.type || seed.type,
+              platform: seed.platform,
+              match: m.imdbRating ? `${Math.round(parseFloat(m.imdbRating) * 10)}% Match` : "98% Match",
+              year: m.releaseInfo || m.year || "2024",
+              rating: seed.type === "series" ? "16+" : "13+",
+              duration: seed.type === "series" ? "Series" : "Movie",
+              quality: "4K Ultra HD",
+              overview: m.description || `Saksikan tayangan ${seed.title} eksklusif di ${seed.platform}.`,
+              poster: m.poster || seed.poster,
+              backdrop: m.background || m.poster || seed.poster
+            };
+          }
+        } catch (e) {}
+        return {
+          id: seed.id,
+          imdbId: seed.id,
+          tmdbId: null,
+          title: seed.title,
+          type: seed.type,
+          platform: seed.platform,
+          match: "98% Match",
+          year: "2024",
+          rating: seed.type === "series" ? "16+" : "13+",
+          duration: seed.type === "series" ? "Series" : "Movie",
+          quality: "4K Ultra HD",
+          overview: `Saksikan tayangan ${seed.title} eksklusif di ${seed.platform}.`,
+          poster: seed.poster,
+          backdrop: seed.poster
+        };
+      });
+      return Promise.all(promises);
+    };
+
+    try {
+      const [netflix, disney, prime, apple_hbo] = await Promise.all([
+        fetchList(platformSeeds.netflix),
+        fetchList(platformSeeds.disney),
+        fetchList(platformSeeds.prime),
+        fetchList(platformSeeds.apple_hbo)
+      ]);
+
+      this.platformCache = { netflix, disney, prime, apple_hbo };
+      this.lastPlatformFetch = Date.now();
+      return this.platformCache;
+    } catch (e) {
+      return {
+        netflix: platformSeeds.netflix,
+        disney: platformSeeds.disney,
+        prime: platformSeeds.prime,
+        apple_hbo: platformSeeds.apple_hbo
+      };
+    }
   }
 
   async getCatalog(forceRefresh = false) {
@@ -128,14 +266,21 @@ class TmdbService {
       // Movies Hero
       let movieHero = heroItem;
 
+      // Fetch platform-specific catalogs
+      const platformData = await this.getPlatformCatalogs();
+
       const rows = [
         { id: "trending-movies", title: "🔥 Trending Movies Hari Ini", items: topMovies.slice(0, 15) },
         { id: "popular-series", title: "📺 Serial TV Terpopuler & Baru", items: topSeries.slice(0, 15) },
+        { id: "netflix-row", title: "🔴 Populer di Netflix", items: platformData.netflix },
+        { id: "disney-row", title: "🔵 Koleksi Terbaik Disney+", items: platformData.disney },
+        { id: "prime-row", title: "🟡 Pilihan Unggulan Prime Video", items: platformData.prime },
+        { id: "apple-hbo-row", title: "⚫ Hits di Apple TV+ & HBO Max", items: platformData.apple_hbo },
         { id: "action-blockbusters", title: "💥 Action & Petualangan Pilihan", items: actionMovies.slice(0, 15) },
         { id: "drama-series", title: "🎭 Drama & Misteri Unggulan", items: dramaSeries.slice(0, 15) },
         { id: "scifi-hits", title: "🚀 Sci-Fi & Fantasi Spektakuler", items: scifiMovies.slice(0, 15) },
         { id: "animation-anime", title: "🍿 Animasi & Anime", items: animationMovies.slice(0, 15) }
-      ].filter(r => r.items.length > 0);
+      ].filter(r => r.items && r.items.length > 0);
 
       // Pre-packaged category views for instant tab switching
       const categories = {
@@ -293,7 +438,8 @@ class TmdbService {
     const found = this.fallback.trending.find(item => item.id === id || item.imdbId === id);
     if (found) {
       const similar = this.fallback.trending.filter(item => item.id !== found.id).slice(0, 6);
-      return { ...found, similar };
+      const matchedPlatform = platformSeedMap[id] ? platformSeedMap[id].platform : null;
+      return { ...found, platform: matchedPlatform, similar };
     }
 
     // Auto-detect type from cached catalog if available
@@ -326,12 +472,14 @@ class TmdbService {
 
       if (data && data.meta) {
         const m = data.meta;
+        const matchedPlatform = platformSeedMap[m.id] ? platformSeedMap[m.id].platform : null;
         return {
           id: m.id,
           imdbId: m.id,
           tmdbId: m.moviedb_id || null,
           title: m.name,
           type: m.type || type,
+          platform: matchedPlatform,
           match: m.imdbRating ? `${Math.round(parseFloat(m.imdbRating) * 10)}% Match` : "95% Match",
           year: m.releaseInfo || m.year || "2024",
           rating: m.certification || (m.type === "series" ? "16+" : "13+"),
