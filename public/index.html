@@ -2,7 +2,12 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="YukNonton" />
+  <meta name="theme-color" content="#141414" />
+  <meta name="format-detection" content="telephone=no" />
   <title>YukNonton - Nonton Film & Serial TV Streaming Sub Indo</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23E50914'><polygon points='5 3 19 12 5 21 5 3'/></svg>" />
   
@@ -78,7 +83,7 @@
 
     <div class="flex items-center space-x-4 md:space-x-6 text-gray-200">
             <!-- Refresh Trending Live Button -->
-      <button id="refreshTrendingBtn" class="flex items-center space-x-1.5 bg-black/60 hover:bg-black/90 border border-red-500/40 hover:border-netflixRed text-xs px-3 py-1 rounded-full text-gray-200 hover:text-white transition shadow cursor-pointer group" title="Muat Ulang Trending Terkini">
+      <button id="refreshTrendingBtn" class="hidden sm:flex items-center space-x-1.5 bg-black/60 hover:bg-black/90 border border-red-500/40 hover:border-netflixRed text-xs px-3 py-1 rounded-full text-gray-200 hover:text-white transition shadow cursor-pointer group" title="Muat Ulang Trending Terkini">
         <span class="w-2 h-2 rounded-full bg-netflixRed animate-ping"></span>
         <span class="font-bold text-[11px] text-red-400 group-hover:text-white">LIVE TRENDING</span>
         <i data-lucide="refresh-cw" class="w-3 h-3 text-gray-400 group-hover:text-white group-hover:rotate-180 transition duration-500"></i>
@@ -233,11 +238,11 @@
   </main>
 
   <!-- ================= DETAIL MODAL ================= -->
-  <div id="detailModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-2 md:p-6 overflow-y-auto">
-    <div class="relative w-full max-w-4xl bg-[#181818] rounded-lg overflow-hidden shadow-2xl my-auto text-white">
+  <div id="detailModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4 md:p-6 overflow-hidden">
+    <div class="relative w-full max-w-4xl bg-[#181818] rounded-t-2xl sm:rounded-xl overflow-hidden shadow-2xl text-white flex flex-col max-h-[92dvh] sm:max-h-[90vh]">
       
       <!-- Modal Header Backdrop -->
-      <div class="relative h-64 md:h-96 w-full">
+      <div class="relative h-52 sm:h-72 md:h-96 w-full flex-shrink-0">
         <img id="modalBackdrop" src="" class="w-full h-full object-cover" />
         <div class="absolute inset-0 modal-backdrop-gradient flex flex-col justify-end p-6 md:p-10">
           <h2 id="modalTitle" class="text-2xl md:text-4xl font-extrabold mb-4 drop-shadow"></h2>
@@ -259,7 +264,7 @@
       </div>
 
       <!-- Modal Body -->
-      <div class="p-6 md:p-10">
+      <div class="p-4 sm:p-6 md:p-10 overflow-y-auto flex-1 touch-scroll overscroll-contain">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           <div class="md:col-span-2 space-y-3">
             <div class="flex items-center space-x-3 text-sm">
@@ -308,21 +313,21 @@
   <div id="videoPlayerOverlay" class="fixed inset-0 z-50 bg-black hidden flex flex-col justify-between">
     
     <!-- Top Bar (Back button + Title + Server Switcher) -->
-    <div class="p-3 md:p-5 flex items-center justify-between bg-gradient-to-b from-black/95 to-transparent z-50">
-      <div class="flex items-center space-x-4">
-        <button id="playerBackBtn" class="p-2 rounded-full hover:bg-white/20 transition cursor-pointer">
-          <i data-lucide="arrow-left" class="w-6 h-6 text-white"></i>
+    <div class="player-header p-3 md:p-5 flex items-center justify-between bg-gradient-to-b from-black/95 to-transparent z-50">
+      <div class="flex items-center space-x-2.5 md:space-x-4 min-w-0 flex-1 mr-2">
+        <button id="playerBackBtn" class="p-2 -ml-1 rounded-full hover:bg-white/20 active:bg-white/30 transition cursor-pointer flex-shrink-0" aria-label="Kembali">
+          <i data-lucide="arrow-left" class="w-5 h-5 md:w-6 md:h-6 text-white"></i>
         </button>
-        <div>
-          <h3 id="playerTitle" class="text-base md:text-lg font-bold tracking-wide"></h3>
-          <span id="currentServerLabel" class="text-xs text-green-400 font-medium">Server HD 1 (Film Asli)</span>
+        <div class="min-w-0 flex-1">
+          <h3 id="playerTitle" class="text-sm md:text-lg font-bold tracking-wide truncate"></h3>
+          <span id="currentServerLabel" class="text-[11px] md:text-xs text-green-400 font-medium block truncate">Server HD 1 (Ultra HD Bebas Iklan)</span>
         </div>
       </div>
 
       <!-- Server Switcher Dropdown -->
-      <div class="flex items-center space-x-2">
+      <div class="flex items-center space-x-1.5 flex-shrink-0">
         <span class="text-xs text-gray-400 hidden sm:inline">Pilih Sumber:</span>
-        <select id="serverSelect" class="bg-[#181818] border border-gray-600 text-xs px-3 py-1.5 rounded text-white focus:outline-none focus:border-netflixRed cursor-pointer shadow">
+        <select id="serverSelect" class="bg-[#181818] border border-gray-600 text-xs px-2.5 py-1.5 rounded-lg text-white focus:outline-none focus:border-netflixRed cursor-pointer shadow max-w-[130px] sm:max-w-none truncate">
           <!-- Dynamic servers populated here -->
         </select>
       </div>
@@ -330,7 +335,7 @@
 
     <!-- Video Element / Embed Container -->
     <div class="relative flex-1 flex items-center justify-center overflow-hidden w-full h-full bg-black">
-      <iframe id="embedPlayer" class="w-full h-full border-0 hidden" allowfullscreen allow="autoplay; encrypted-media; fullscreen"></iframe>
+      <iframe id="embedPlayer" class="w-full h-full border-0 hidden" allowfullscreen allow="autoplay; encrypted-media; fullscreen; picture-in-picture" referrerpolicy="no-referrer" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation allow-modals"></iframe>
       <video id="videoElement" class="w-full h-full object-contain cursor-pointer hidden" playsinline></video>
       <div id="playerLoader" class="absolute inset-0 flex items-center justify-center bg-black/40">
         <div class="w-12 h-12 border-4 border-netflixRed border-t-transparent rounded-full animate-spin"></div>

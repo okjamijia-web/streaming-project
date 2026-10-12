@@ -1,81 +1,242 @@
-/* Netflix Design System Styles */
+/* ==========================================================================
+   YukNonton - iOS & Modern Responsive Design System
+   ========================================================================== */
+
 :root {
   --netflix-red: #E50914;
   --netflix-black: #141414;
   --netflix-dark: #181818;
   --netflix-gray: #808080;
+  
+  /* iOS Safe Area Insets */
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+}
+
+/* Base Native Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  background-color: var(--netflix-black);
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   background-color: var(--netflix-black);
   color: #FFFFFF;
-  font-family: 'Netflix Sans', 'Helvetica Neue', Segoe UI, Roboto, Ubuntu, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Netflix Sans', 'Helvetica Neue', Segoe UI, Roboto, Ubuntu, sans-serif;
   overflow-x: hidden;
   user-select: none;
+  -webkit-user-select: none;
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
-/* Custom Scrollbar */
+/* Prevent iOS Auto-Zoom on Input Focus while keeping crisp UI */
+input[type="text"],
+input[type="search"],
+select {
+  font-size: 16px !important;
+}
+@media (min-width: 768px) {
+  input[type="text"],
+  input[type="search"],
+  select {
+    font-size: 0.875rem !important;
+  }
+}
+
+/* Custom Scrollbar for Desktop */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: #141414;
 }
 ::-webkit-scrollbar-thumb {
   background: #333333;
-  border-radius: 4px;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #555555;
 }
 
-/* Hide scrollbar for carousel row */
+/* Hide scrollbar for carousel row & mobile bars */
 .hide-scrollbar::-webkit-scrollbar {
-  display: none;
+  display: none !important;
 }
 .hide-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+  -webkit-overflow-scrolling: touch;
 }
 
-/* Netflix Top 10 Giant Numbers */
+.touch-scroll {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ================= NAVBAR (SAFE AREA AWARE) ================= */
+#navbar {
+  padding-top: calc(0.75rem + var(--sat));
+  padding-left: calc(1rem + var(--sal));
+  padding-right: calc(1rem + var(--sar));
+}
+
+#mobileCategoryBar {
+  top: calc(3.8rem + var(--sat));
+  padding-left: calc(1rem + var(--sal));
+  padding-right: calc(1rem + var(--sar));
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+}
+
+/* ================= HERO BILLBOARD ================= */
+.hero-vignette {
+  background: linear-gradient(77deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 60%, rgba(0,0,0,0) 85%),
+              linear-gradient(180deg, rgba(20,20,20,0) 45%, rgba(20,20,20,0.8) 80%, #141414 100%);
+}
+
+@media (max-width: 768px) {
+  #heroBillboard {
+    height: 64vh;
+    height: 64dvh;
+    min-height: 440px;
+  }
+  .hero-vignette {
+    padding-top: calc(4rem + var(--sat));
+    padding-bottom: calc(5.5rem + var(--sab));
+    background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(20,20,20,0.1) 35%, rgba(20,20,20,0.85) 75%, #141414 100%),
+                linear-gradient(90deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 100%);
+  }
+}
+
+/* ================= TOP 10 GIANT NUMBERS ================= */
 .top10-number {
-  font-size: 8rem;
+  font-size: 7.5rem;
   line-height: 0.8;
   font-weight: 900;
   color: #141414;
   -webkit-text-stroke: 4px #595959;
   text-shadow: 0 0 15px rgba(0,0,0,0.8);
-  letter-spacing: -15px;
-  margin-right: -10px;
+  letter-spacing: -14px;
+  margin-right: -8px;
   z-index: 10;
   transition: all 0.3s ease;
+  user-select: none;
 }
+
+@media (max-width: 640px) {
+  .top10-number {
+    font-size: 5.5rem;
+    line-height: 0.82;
+    -webkit-text-stroke: 2.5px #595959;
+    letter-spacing: -9px;
+    margin-right: -4px;
+  }
+}
+
 .top10-card:hover .top10-number {
   -webkit-text-stroke: 4px #E50914;
   transform: scale(1.05);
 }
 
-/* Card Hover Animation */
+/* ================= CARDS & INTERACTION (iOS Native) ================= */
 .movie-card {
-  transition: transform 0.35s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.35s cubic-bezier(0.2, 0, 0, 1);
+  transition: transform 0.28s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.28s cubic-bezier(0.2, 0, 0, 1);
   will-change: transform;
 }
-.movie-card:hover {
-  transform: scale(1.08) translateY(-6px);
-  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.9), 0 0 12px rgba(229, 9, 20, 0.4);
-  z-index: 30;
+
+@media (hover: hover) and (pointer: fine) {
+  .movie-card:hover {
+    transform: scale(1.06) translateY(-4px);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.9), 0 0 12px rgba(229, 9, 20, 0.4);
+    z-index: 30;
+  }
 }
 
-/* Hero Vignette & Gradients */
-.hero-vignette {
-  background: linear-gradient(77deg, rgba(0,0,0,.8) 0%, rgba(0,0,0,0) 85%),
-              linear-gradient(180deg, rgba(20,20,20,0) 60%, #141414 100%);
+.movie-card:active {
+  transform: scale(0.96);
+  transition: transform 0.12s ease;
 }
 
+/* Carousel tracks touch feel */
+.carousel-track, #top10Row {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  scroll-snap-type: x proximity;
+}
+
+.carousel-track > div, #top10Row > div {
+  scroll-snap-align: start;
+}
+
+/* Hide desktop carousel arrows on touch/mobile devices */
+@media (max-width: 768px) {
+  .prev-btn, .next-btn, #top10PrevBtn, #top10NextBtn {
+    display: none !important;
+  }
+}
+
+/* ================= DETAIL MODAL (iOS Native Bottom Sheet feel) ================= */
 .modal-backdrop-gradient {
-  background: linear-gradient(180deg, rgba(24,24,24,0) 40%, #181818 100%);
+  background: linear-gradient(180deg, rgba(24,24,24,0) 30%, rgba(24,24,24,0.85) 75%, #181818 100%);
+}
+
+@media (max-width: 640px) {
+  #detailModal > div {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    margin-bottom: 0 !important;
+    animation: slideUpMobile 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+}
+
+@keyframes slideUpMobile {
+  from {
+    transform: translateY(100%);
+    opacity: 0.8;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ================= VIDEO PLAYER OVERLAY (FULLSCREEN AWARE) ================= */
+#videoPlayerOverlay {
+  height: 100vh;
+  height: 100dvh;
+  width: 100vw;
+  position: fixed;
+  inset: 0;
+  background-color: #000;
+  z-index: 9999;
+}
+
+.player-header {
+  padding-top: calc(0.75rem + var(--sat));
+  padding-left: calc(0.85rem + var(--sal));
+  padding-right: calc(0.85rem + var(--sar));
+}
+
+#playerControls {
+  padding-bottom: calc(1.2rem + var(--sab));
+  padding-left: calc(1rem + var(--sal));
+  padding-right: calc(1rem + var(--sar));
+}
+
+#embedPlayer {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 100% !important;
+  border: 0 !important;
 }
 
 /* Player Custom Scrubber */
@@ -99,7 +260,8 @@ input[type=range].netflix-slider::-webkit-slider-thumb {
   margin-top: -5px;
   transition: transform 0.1s;
 }
-input[type=range].netflix-slider:hover::-webkit-slider-thumb {
+input[type=range].netflix-slider:hover::-webkit-slider-thumb,
+input[type=range].netflix-slider:active::-webkit-slider-thumb {
   transform: scale(1.4);
 }
 
