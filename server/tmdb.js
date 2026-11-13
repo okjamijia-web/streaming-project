@@ -88,6 +88,32 @@ Object.values(platformSeeds).flat().forEach(item => {
   platformSeedMap[item.id] = item;
 });
 
+const DEFAULT_POSTER = "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg";
+
+const matchOf = (m, fallback) => m.imdbRating ? `${Math.round(parseFloat(m.imdbRating) * 10)}% Match` : fallback;
+
+const formatMeta = (m, type, overviewSuffix) => ({
+  id: m.id,
+  imdbId: m.id,
+  tmdbId: m.moviedb_id || null,
+  title: m.name,
+  type: m.type || type,
+  match: matchOf(m, `${Math.floor(Math.random() * 6) + 94}% Match`),
+  year: m.releaseInfo || m.year || "2024",
+  rating: type === "series" ? "16+" : "13+",
+  duration: type === "series" ? "Series" : "Movie",
+  quality: "4K Ultra HD",
+  overview: m.description || `Saksikan tayangan ${m.name} ${overviewSuffix}`,
+  poster: m.poster || DEFAULT_POSTER,
+  backdrop: m.background || m.poster
+});
+
+// Ambil array metas dari hasil Promise.allSettled, kosong jika gagal
+const metasOf = (res, type, overviewSuffix) =>
+  res.status === "fulfilled" && res.value && Array.isArray(res.value.metas)
+    ? res.value.metas.map(m => formatMeta(m, type, overviewSuffix))
+    : [];
+
 class TmdbService {
   constructor() {
     this.fallback = fallbackData;
@@ -117,7 +143,7 @@ class TmdbService {
               title: m.name || seed.title,
               type: m.type || seed.type,
               platform: seed.platform,
-              match: m.imdbRating ? `${Math.round(parseFloat(m.imdbRating) * 10)}% Match` : "98% Match",
+              match: matchOf(m, "98% Match"),
               year: m.releaseInfo || m.year || "2024",
               rating: seed.type === "series" ? "16+" : "13+",
               duration: seed.type === "series" ? "Series" : "Movie",
@@ -194,49 +220,15 @@ class TmdbService {
         fetch(`${this.cinemetaBase}/catalog/series/top/genre=Drama.json`).then(r => r.json())
       ]);
 
-      const formatMeta = (m, type = "movie") => ({
-        id: m.id,
-        imdbId: m.id,
-        tmdbId: m.moviedb_id || null,
-        title: m.name,
-        type: m.type || type,
-        match: m.imdbRating ? `${Math.round(parseFloat(m.imdbRating) * 10)}% Match` : `${Math.floor(Math.random() * 6) + 94}% Match`,
-        year: m.releaseInfo || m.year || "2024",
-        rating: type === "series" ? "16+" : "13+",
-        duration: type === "series" ? "Series" : "Movie",
-        quality: "4K Ultra HD",
-        overview: m.description || `Saksikan tayangan ${m.name} secara langsung dalam kualitas Full HD dan 4K.`,
-        poster: m.poster || "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
-        backdrop: m.background || m.poster
-      });
-
-      const topMovies = (topMoviesRes.status === "fulfilled" && topMoviesRes.value && topMoviesRes.value.metas)
-        ? topMoviesRes.value.metas.map(m => formatMeta(m, "movie"))
-        : this.fallback.trending;
-
-      const topSeries = (topSeriesRes.status === "fulfilled" && topSeriesRes.value && topSeriesRes.value.metas)
-        ? topSeriesRes.value.metas.map(m => formatMeta(m, "series"))
-        : [];
-
-      const actionMovies = (actionRes.status === "fulfilled" && actionRes.value && actionRes.value.metas)
-        ? actionRes.value.metas.map(m => formatMeta(m, "movie"))
-        : [];
-
-      const animationMovies = (animationRes.status === "fulfilled" && animationRes.value && animationRes.value.metas)
-        ? animationRes.value.metas.map(m => formatMeta(m, "movie"))
-        : [];
-
-      const scifiMovies = (scifiRes.status === "fulfilled" && scifiRes.value && scifiRes.value.metas)
-        ? scifiRes.value.metas.map(m => formatMeta(m, "movie"))
-        : [];
-
-      const actionSeries = (actionSeriesRes.status === "fulfilled" && actionSeriesRes.value && actionSeriesRes.value.metas)
-        ? actionSeriesRes.value.metas.map(m => formatMeta(m, "series"))
-        : [];
-
-      const dramaSeries = (dramaSeriesRes.status === "fulfilled" && dramaSeriesRes.value && dramaSeriesRes.value.metas)
-        ? dramaSeriesRes.value.metas.map(m => formatMeta(m, "series"))
-        : [];
+      const sfx = "secara langsung dalam kualitas Full HD dan 4K.";
+      const fetchedMovies = metasOf(topMoviesRes, "movie", sfx);
+      const topMovies = fetchedMovies.length ? fetchedMovies : this.fallback.trending;
+      const topSeries = metasOf(topSeriesRes, "series", sfx);
+      const actionMovies = metasOf(actionRes, "movie", sfx);
+      const animationMovies = metasOf(animationRes, "movie", sfx);
+      const scifiMovies = metasOf(scifiRes, "movie", sfx);
+      const actionSeries = metasOf(actionSeriesRes, "series", sfx);
+      const dramaSeries = metasOf(dramaSeriesRes, "series", sfx);
 
       // Top 10 lists
       const top10 = topMovies.slice(0, 10).map((item, idx) => ({ ...item, top10: idx + 1 }));
@@ -244,13 +236,9 @@ class TmdbService {
       const moviesTop10 = topMovies.slice(0, 10).map((item, idx) => ({ ...item, top10: idx + 1 }));
 
       // Fetch detail for top 3 items to get high-res backdrops and full overviews
-      const heroPool = [];
-      for (const item of top10.slice(0, 3)) {
-        try {
-          const detail = await this.getDetail(item.id, item.type);
-          if (detail) heroPool.push(detail);
-        } catch (e) {}
-      }
+      const heroPool = (await Promise.all(
+        top10.slice(0, 3).map(item => this.getDetail(item.id, item.type).catch(() => null))
+      )).filter(Boolean);
       if (heroPool.length === 0) heroPool.push(top10[0]);
       const heroItem = heroPool[Math.floor(Math.random() * heroPool.length)];
 
@@ -361,29 +349,9 @@ class TmdbService {
         fetch(`${this.cinemetaBase}/catalog/series/top/genre=${encodeURIComponent(cinemetaGenre)}.json`).then(r => r.json())
       ]);
 
-      const formatMeta = (m, type = "movie") => ({
-        id: m.id,
-        imdbId: m.id,
-        tmdbId: m.moviedb_id || null,
-        title: m.name,
-        type: m.type || type,
-        match: m.imdbRating ? `${Math.round(parseFloat(m.imdbRating) * 10)}% Match` : `${Math.floor(Math.random() * 6) + 94}% Match`,
-        year: m.releaseInfo || m.year || "2024",
-        rating: type === "series" ? "16+" : "13+",
-        duration: type === "series" ? "Series" : "Movie",
-        quality: "4K Ultra HD",
-        overview: m.description || `Saksikan tayangan ${m.name} kategori ${genreName} dalam kualitas Full HD dan 4K.`,
-        poster: m.poster || "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
-        backdrop: m.background || m.poster
-      });
-
-      const movies = (moviesRes.status === "fulfilled" && moviesRes.value && moviesRes.value.metas)
-        ? moviesRes.value.metas.map(m => formatMeta(m, "movie"))
-        : [];
-
-      const series = (seriesRes.status === "fulfilled" && seriesRes.value && seriesRes.value.metas)
-        ? seriesRes.value.metas.map(m => formatMeta(m, "series"))
-        : [];
+      const sfx = `kategori ${genreName} dalam kualitas Full HD dan 4K.`;
+      const movies = metasOf(moviesRes, "movie", sfx);
+      const series = metasOf(seriesRes, "series", sfx);
 
       const combined = [...movies, ...series].sort(() => 0.5 - Math.random());
       const top10 = (movies.length > 0 ? movies : series).slice(0, 10).map((item, idx) => ({ ...item, top10: idx + 1 }));
@@ -480,7 +448,7 @@ class TmdbService {
           title: m.name,
           type: m.type || type,
           platform: matchedPlatform,
-          match: m.imdbRating ? `${Math.round(parseFloat(m.imdbRating) * 10)}% Match` : "95% Match",
+          match: matchOf(m, "95% Match"),
           year: m.releaseInfo || m.year || "2024",
           rating: m.certification || (m.type === "series" ? "16+" : "13+"),
           duration: m.runtime || (m.type === "series" ? "TV Series" : "Movie"),
@@ -505,7 +473,7 @@ class TmdbService {
     if (!Array.isArray(videos) || videos.length === 0) return [];
     const seasonMap = new Map();
     videos.forEach(v => {
-      const s = v.season || 1;
+      const s = v.season ?? 1;
       if (!seasonMap.has(s)) seasonMap.set(s, []);
       seasonMap.get(s).push({
         episodeNumber: v.episode || 1,
@@ -520,16 +488,16 @@ class TmdbService {
     seasonMap.forEach((eps, seasonNum) => {
       seasons.push({
         seasonNumber: seasonNum,
-        name: `Season ${seasonNum}`,
+        name: seasonNum === 0 ? "Specials" : `Season ${seasonNum}`,
         episodes: eps.sort((a, b) => a.episodeNumber - b.episodeNumber)
       });
     });
-    return seasons.sort((a, b) => a.seasonNumber - b.seasonNumber);
+    // Specials (season 0) ditaruh paling akhir
+    return seasons.sort((a, b) => (a.seasonNumber || Infinity) - (b.seasonNumber || Infinity));
   }
 
   async search(query) {
     if (!query) return [];
-    const q = query.toLowerCase().trim();
 
     try {
       const [moviesRes, seriesRes] = await Promise.allSettled([
@@ -537,35 +505,19 @@ class TmdbService {
         fetch(`${this.cinemetaBase}/catalog/series/top/search=${encodeURIComponent(query)}.json`).then(r => r.json())
       ]);
 
-      const globalItems = [];
-
-      if (moviesRes.status === "fulfilled" && moviesRes.value && moviesRes.value.metas) {
-        moviesRes.value.metas.slice(0, 15).forEach(m => {
-          globalItems.push({
-            id: m.id,
-            imdbId: m.id,
-            title: m.name,
-            type: "movie",
-            match: m.imdbRating ? `${Math.round(parseFloat(m.imdbRating) * 10)}% Match` : "95% Match",
-            year: m.releaseInfo || m.year || "",
-            poster: m.poster
-          });
-        });
-      }
-
-      if (seriesRes.status === "fulfilled" && seriesRes.value && seriesRes.value.metas) {
-        seriesRes.value.metas.slice(0, 15).forEach(m => {
-          globalItems.push({
-            id: m.id,
-            imdbId: m.id,
-            title: m.name,
-            type: "series",
-            match: m.imdbRating ? `${Math.round(parseFloat(m.imdbRating) * 10)}% Match` : "95% Match",
-            year: m.releaseInfo || m.year || "",
-            poster: m.poster
-          });
-        });
-      }
+      const toResult = (res, type) =>
+        res.status === "fulfilled" && res.value && Array.isArray(res.value.metas)
+          ? res.value.metas.slice(0, 15).map(m => ({
+              id: m.id,
+              imdbId: m.id,
+              title: m.name,
+              type,
+              match: matchOf(m, "95% Match"),
+              year: m.releaseInfo || m.year || "",
+              poster: m.poster
+            }))
+          : [];
+      const globalItems = [...toResult(moviesRes, "movie"), ...toResult(seriesRes, "series")];
 
       const seen = new Set();
       const combined = [];

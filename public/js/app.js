@@ -1,4 +1,6 @@
 // YukNonton Frontend Application Controller
+const esc = (v) => String(v ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
 class NetflixApp {
   constructor() {
     this.catalog = null;
@@ -64,6 +66,7 @@ class NetflixApp {
     // State
     this.currentCategory = "home";
     this.myList = JSON.parse(localStorage.getItem("yuknonton_my_list") || localStorage.getItem("netflix_my_list") || "[]");
+    this.history = JSON.parse(localStorage.getItem("yuknonton_history") || "[]");
     this.currentHeroItem = null;
 
     // Modal
@@ -407,6 +410,7 @@ class NetflixApp {
           this.renderHero(catData.hero, catData.heroTypeBadge);
           this.renderTop10(catData.top10, catData.top10Title);
           this.renderRows(catData.rows);
+          this.renderContinueWatching();
         }
       }
     }
@@ -464,7 +468,7 @@ class NetflixApp {
       this.rowsContainer.innerHTML = `
         <div class="flex items-center justify-center py-24 text-gray-400">
           <div class="w-10 h-10 border-4 border-netflixRed border-t-transparent rounded-full animate-spin mr-3"></div>
-          <span class="font-bold text-base text-gray-200">Memuat Kategori ${genreName}...</span>
+          <span class="font-bold text-base text-gray-200">Memuat Kategori ${esc(genreName)}...</span>
         </div>
       `;
     }
@@ -512,10 +516,10 @@ class NetflixApp {
       card.innerHTML = `
         <div class="top10-number">${idx + 1}</div>
         <div class="w-36 md:w-44 lg:w-52 h-52 md:h-64 lg:h-72 rounded-md overflow-hidden relative shadow-lg movie-card">
-          <img src="${item.poster}" alt="${item.title}" class="w-full h-full object-cover rounded-md" loading="lazy" />
+          <img src="${esc(item.poster)}" alt="${esc(item.title)}" class="w-full h-full object-cover rounded-md" loading="lazy" />
           <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex flex-col justify-end p-3">
-            <span class="text-xs text-green-400 font-bold">${item.match}</span>
-            <span class="text-xs text-gray-300">${item.duration} · ${item.rating}</span>
+            <span class="text-xs text-green-400 font-bold">${esc(item.match)}</span>
+            <span class="text-xs text-gray-300">${esc(item.duration)} · ${esc(item.rating)}</span>
           </div>
         </div>
       `;
@@ -636,25 +640,25 @@ class NetflixApp {
 
     this.myListEmpty.classList.add("hidden");
     this.myListGrid.innerHTML = this.myList.map(item => `
-      <div class="relative group rounded-md overflow-hidden bg-[#181818] shadow-lg cursor-pointer movie-card" data-id="${item.id}" data-type="${item.type || 'movie'}">
+      <div class="relative group rounded-md overflow-hidden bg-[#181818] shadow-lg cursor-pointer movie-card" data-id="${esc(item.id)}" data-type="${esc(item.type || 'movie')}">
         <div class="aspect-[2/3] w-full overflow-hidden relative">
-          <img src="${item.poster}" alt="${item.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy" />
-          <button class="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/70 hover:bg-red-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-200 remove-from-list" data-id="${item.id}" title="Hapus dari Daftar Saya">
+          <img src="${esc(item.poster)}" alt="${esc(item.title)}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy" />
+          <button class="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/70 hover:bg-red-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-200 remove-from-list" data-id="${esc(item.id)}" title="Hapus dari Daftar Saya">
             <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
           </button>
         </div>
         <div class="p-2.5">
-          <h4 class="font-bold text-xs md:text-sm text-white truncate">${item.title}</h4>
+          <h4 class="font-bold text-xs md:text-sm text-white truncate">${esc(item.title)}</h4>
           <div class="flex items-center justify-between mt-1 text-[11px] text-gray-400">
-            <span class="text-green-400 font-bold">${item.match}</span>
-            <span>${item.year} · ${item.type === 'series' ? 'TV' : 'Movie'}</span>
+            <span class="text-green-400 font-bold">${esc(item.match)}</span>
+            <span>${esc(item.year)} · ${item.type === 'series' ? 'TV' : 'Movie'}</span>
           </div>
           <div class="flex items-center space-x-2 mt-2">
-            <button class="flex-1 bg-white hover:bg-gray-200 text-black text-xs font-bold py-1 rounded flex items-center justify-center space-x-1 play-my-list" data-id="${item.id}" data-type="${item.type || 'movie'}">
+            <button class="flex-1 bg-white hover:bg-gray-200 text-black text-xs font-bold py-1 rounded flex items-center justify-center space-x-1 play-my-list" data-id="${esc(item.id)}" data-type="${esc(item.type || 'movie')}">
               <i data-lucide="play" class="w-3 h-3 fill-current"></i>
               <span>Play</span>
             </button>
-            <button class="w-7 h-7 rounded bg-[#2a2a2a] hover:bg-[#333] text-white flex items-center justify-center info-my-list" data-id="${item.id}" data-type="${item.type || 'movie'}">
+            <button class="w-7 h-7 rounded bg-[#2a2a2a] hover:bg-[#333] text-white flex items-center justify-center info-my-list" data-id="${esc(item.id)}" data-type="${esc(item.type || 'movie')}">
               <i data-lucide="info" class="w-3.5 h-3.5"></i>
             </button>
           </div>
@@ -701,15 +705,15 @@ class NetflixApp {
       rowDiv.className = "relative mb-8 group";
 
       rowDiv.innerHTML = `
-        <h2 class="text-lg md:text-xl lg:text-2xl font-bold mb-3 px-4 md:px-12 text-gray-100">${row.title}</h2>
+        <h2 class="text-lg md:text-xl lg:text-2xl font-bold mb-3 px-4 md:px-12 text-gray-100">${esc(row.title)}</h2>
         <div class="relative">
           <button class="absolute left-0 top-0 bottom-0 z-40 w-10 md:w-12 bg-black/60 hover:bg-black/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-300 cursor-pointer prev-btn">
             <i data-lucide="chevron-left" class="w-8 h-8 text-white"></i>
           </button>
           <div class="flex items-center space-x-3 md:space-x-4 overflow-x-auto hide-scrollbar px-4 md:px-12 scroll-smooth carousel-track py-4">
             ${row.items.map(item => `
-              <div class="flex-none w-36 md:w-48 lg:w-56 h-52 md:h-72 lg:h-80 rounded-md overflow-hidden relative shadow-md cursor-pointer movie-card" data-id="${item.id}" data-type="${item.type || "movie"}">
-                <img src="${item.poster}" alt="${item.title}" class="w-full h-full object-cover rounded-md" loading="lazy" />
+              <div class="flex-none w-36 md:w-48 lg:w-56 h-52 md:h-72 lg:h-80 rounded-md overflow-hidden relative shadow-md cursor-pointer movie-card" data-id="${esc(item.id)}" data-type="${esc(item.type || "movie")}">
+                <img src="${esc(item.poster)}" alt="${esc(item.title)}" class="w-full h-full object-cover rounded-md" loading="lazy" />
                 ${item.platform ? `
                   <div class="absolute top-2 left-2 z-10 pointer-events-none">
                     <span class="text-[9px] md:text-[10px] font-extrabold px-1.5 py-0.5 rounded shadow-md tracking-wider uppercase ${
@@ -719,21 +723,21 @@ class NetflixApp {
                       item.platform === 'Apple TV+' ? 'bg-black/90 border border-gray-500 text-white' :
                       item.platform === 'HBO Max' ? 'bg-[#5822B4] text-white' :
                       'bg-gray-800 text-white'
-                    }">${item.platform}</span>
+                    }">${esc(item.platform)}</span>
                   </div>
                 ` : ''}
                 <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 hover:opacity-100 transition duration-300 flex flex-col justify-end p-3">
-                  <h4 class="font-bold text-sm line-clamp-1">${item.title}</h4>
+                  <h4 class="font-bold text-sm line-clamp-1">${esc(item.title)}</h4>
                   <div class="flex items-center space-x-2 mt-1">
-                    <span class="text-xs text-green-400 font-bold">${item.match}</span>
-                    <span class="text-[10px] border border-gray-400 px-1 rounded">${item.rating}</span>
-                    ${item.platform ? `<span class="text-[10px] text-gray-300 font-semibold">${item.platform}</span>` : ''}
+                    <span class="text-xs text-green-400 font-bold">${esc(item.match)}</span>
+                    <span class="text-[10px] border border-gray-400 px-1 rounded">${esc(item.rating)}</span>
+                    ${item.platform ? `<span class="text-[10px] text-gray-300 font-semibold">${esc(item.platform)}</span>` : ''}
                   </div>
                   <div class="flex items-center space-x-2 mt-2">
-                    <button class="w-7 h-7 rounded-full bg-white text-black flex items-center justify-center hover:bg-gray-200 play-quick" data-id="${item.id}" data-type="${item.type || "movie"}">
+                    <button class="w-7 h-7 rounded-full bg-white text-black flex items-center justify-center hover:bg-gray-200 play-quick" data-id="${esc(item.id)}" data-type="${esc(item.type || "movie")}">
                       <i data-lucide="play" class="w-3.5 h-3.5 fill-current"></i>
                     </button>
-                    <button class="w-7 h-7 rounded-full bg-[#2a2a2a] border border-gray-400 text-white flex items-center justify-center hover:border-white info-quick" data-id="${item.id}" data-type="${item.type || "movie"}">
+                    <button class="w-7 h-7 rounded-full bg-[#2a2a2a] border border-gray-400 text-white flex items-center justify-center hover:border-white info-quick" data-id="${esc(item.id)}" data-type="${esc(item.type || "movie")}">
                       <i data-lucide="chevron-down" class="w-4 h-4"></i>
                     </button>
                   </div>
@@ -758,7 +762,7 @@ class NetflixApp {
           if (e.target.closest(".play-quick")) {
             e.stopPropagation();
             const title = c.querySelector("h4") ? c.querySelector("h4").textContent : "Playing";
-            this.openPlayer({ id, type, title });
+            this.openPlayer({ id, type, title, poster: c.querySelector("img")?.src });
           } else {
             this.openModal(id, type);
           }
@@ -793,7 +797,7 @@ class NetflixApp {
     this.searchResultsContainer.innerHTML = `
       <div class="px-4 md:px-12 pt-24 pb-12">
         <h2 class="text-xl md:text-2xl font-bold mb-6 text-gray-200">
-          Search Results for: <span class="text-white font-extrabold">"${query}"</span>
+          Search Results for: <span class="text-white font-extrabold">"${esc(query)}"</span>
         </h2>
         ${results.length === 0 ? `
           <div class="py-20 text-center text-gray-400">
@@ -803,11 +807,11 @@ class NetflixApp {
         ` : `
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
             ${results.map(item => `
-              <div class="rounded-md overflow-hidden shadow-lg cursor-pointer movie-card relative group h-64 md:h-80" data-id="${item.id}" data-type="${item.type || "movie"}">
-                <img src="${item.poster}" alt="${item.title}" class="w-full h-full object-cover" />
+              <div class="rounded-md overflow-hidden shadow-lg cursor-pointer movie-card relative group h-64 md:h-80" data-id="${esc(item.id)}" data-type="${esc(item.type || "movie")}">
+                <img src="${esc(item.poster)}" alt="${esc(item.title)}" class="w-full h-full object-cover" />
                 <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex flex-col justify-end p-3">
-                  <span class="font-bold text-sm">${item.title}</span>
-                  <span class="text-xs text-green-400 mt-1">${item.match} · ${item.year}</span>
+                  <span class="font-bold text-sm">${esc(item.title)}</span>
+                  <span class="text-xs text-green-400 mt-1">${esc(item.match)} · ${esc(item.year)}</span>
                 </div>
               </div>
             `).join("")}
@@ -825,7 +829,7 @@ class NetflixApp {
 
   async openModal(id, type = "movie") {
     try {
-      const res = await fetch(`/api/detail/${id}?type=${type}`);
+      const res = await fetch(`/api/detail/${encodeURIComponent(id)}?type=${encodeURIComponent(type)}`);
       const item = await res.json();
       this.activeItem = item;
 
@@ -865,29 +869,32 @@ class NetflixApp {
 
         // Populate Season Dropdown
         this.modalSeasonSelect.innerHTML = item.seasons.map(s => `
-          <option value="${s.seasonNumber}" class="bg-[#181818]">${s.name || 'Season ' + s.seasonNumber} (${s.episodes ? s.episodes.length : 0} Episode)</option>
+          <option value="${esc(s.seasonNumber)}" class="bg-[#181818]">${esc(s.name || 'Season ' + s.seasonNumber)} (${s.episodes ? s.episodes.length : 0} Episode)</option>
         `).join("");
 
         const renderEpisodes = (seasonNum) => {
           const selectedSeason = item.seasons.find(s => s.seasonNumber === seasonNum) || item.seasons[0];
           this.modalEpisodesList.innerHTML = selectedSeason.episodes.map(ep => `
-            <div class="flex items-center space-x-4 p-3.5 rounded-lg bg-[#242424] hover:bg-[#2f2f2f] transition cursor-pointer group border border-transparent hover:border-gray-600" onclick="app.openPlayer(app.activeItem, ${seasonNum}, ${ep.episodeNumber})">
-              <span class="text-lg font-bold text-gray-400 w-6 text-center">${ep.episodeNumber}</span>
+            <div class="flex items-center space-x-4 p-3.5 rounded-lg bg-[#242424] hover:bg-[#2f2f2f] transition cursor-pointer group border border-transparent hover:border-gray-600" data-ep="${esc(ep.episodeNumber)}">
+              <span class="text-lg font-bold text-gray-400 w-6 text-center">${esc(ep.episodeNumber)}</span>
               <div class="w-28 md:w-32 h-16 md:h-20 rounded overflow-hidden relative flex-shrink-0 bg-black/50">
-                <img src="${ep.thumbnail || item.backdrop}" alt="${ep.title}" class="w-full h-full object-cover" />
+                <img src="${esc(ep.thumbnail || item.backdrop)}" alt="${esc(ep.title)}" class="w-full h-full object-cover" />
                 <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
                   <i data-lucide="play" class="w-6 h-6 text-white fill-current"></i>
                 </div>
               </div>
               <div class="flex-1 min-w-0">
                 <div class="flex justify-between items-center mb-1">
-                  <h4 class="font-bold text-sm text-white truncate pr-2">${ep.title}</h4>
-                  <span class="text-xs text-gray-400 flex-shrink-0">${ep.duration || '45m'}</span>
+                  <h4 class="font-bold text-sm text-white truncate pr-2">${esc(ep.title)}</h4>
+                  <span class="text-xs text-gray-400 flex-shrink-0">${esc(ep.duration || '45m')}</span>
                 </div>
-                <p class="text-xs text-gray-400 line-clamp-2">${ep.overview || 'Tonton episode lengkap ini sekarang.'}</p>
+                <p class="text-xs text-gray-400 line-clamp-2">${esc(ep.overview || 'Tonton episode lengkap ini sekarang.')}</p>
               </div>
             </div>
           `).join("");
+          this.modalEpisodesList.querySelectorAll("[data-ep]").forEach(el => {
+            el.onclick = () => this.openPlayer(item, seasonNum, parseInt(el.dataset.ep));
+          });
           if (window.lucide) lucide.createIcons();
         };
 
@@ -904,18 +911,21 @@ class NetflixApp {
 
       if (item.similar && item.similar.length > 0) {
         this.modalSimilarGrid.innerHTML = item.similar.map(sim => `
-          <div class="rounded-md bg-[#242424] overflow-hidden cursor-pointer hover:scale-105 transition" onclick="app.openModal('${sim.id}')">
-            <img src="${sim.backdrop || sim.poster}" class="w-full h-28 object-cover" />
+          <div class="rounded-md bg-[#242424] overflow-hidden cursor-pointer hover:scale-105 transition" data-id="${esc(sim.id)}" data-type="${esc(sim.type || 'movie')}">
+            <img src="${esc(sim.backdrop || sim.poster)}" class="w-full h-28 object-cover" />
             <div class="p-3">
               <div class="flex items-center justify-between mb-1">
-                <span class="text-xs text-green-400 font-bold">${sim.match}</span>
-                <span class="text-[10px] border border-gray-500 px-1 rounded">${sim.rating}</span>
+                <span class="text-xs text-green-400 font-bold">${esc(sim.match)}</span>
+                <span class="text-[10px] border border-gray-500 px-1 rounded">${esc(sim.rating)}</span>
               </div>
-              <h5 class="text-sm font-bold line-clamp-1">${sim.title}</h5>
-              <p class="text-xs text-gray-400 mt-1 line-clamp-2">${sim.overview}</p>
+              <h5 class="text-sm font-bold line-clamp-1">${esc(sim.title)}</h5>
+              <p class="text-xs text-gray-400 mt-1 line-clamp-2">${esc(sim.overview)}</p>
             </div>
           </div>
         `).join("");
+        this.modalSimilarGrid.querySelectorAll("[data-id]").forEach(el => {
+          el.onclick = () => this.openModal(el.dataset.id, el.dataset.type);
+        });
       }
 
       this.updateModalListBtn();
@@ -934,18 +944,19 @@ class NetflixApp {
 
   async openPlayer(item, season = 1, episode = 1) {
     if (!item) return;
+    this.saveHistory(item, season, episode);
     this.playerTitle.textContent = item.type === "series" ? `${item.title} - S${season}E${episode}` : item.title;
     this.videoPlayerOverlay.classList.remove("hidden");
     this.playerLoader.classList.remove("hidden");
     document.body.classList.add("overflow-hidden");
 
     try {
-      const res = await fetch(`/api/stream/${item.type || 'movie'}/${item.id}?season=${season}&episode=${episode}`);
+      const res = await fetch(`/api/stream/${encodeURIComponent(item.type || "movie")}/${encodeURIComponent(item.id)}?season=${season}&episode=${episode}`);
       this.streamsData = await res.json();
 
       // Populate Server Select
       this.serverSelect.innerHTML = this.streamsData.streams.map(s => `
-        <option value="${s.id}" class="bg-[#181818]">${s.name}</option>
+        <option value="${esc(s.id)}" class="bg-[#181818]">${esc(s.name)}</option>
       `).join("");
 
       // Default to Server HD 1 (Real Film Embed)
@@ -1096,6 +1107,76 @@ class NetflixApp {
     }
     this.videoPlayerOverlay.classList.add("hidden");
     document.body.classList.remove("overflow-hidden");
+    this.renderContinueWatching();
+  }
+
+  saveHistory(item, season, episode) {
+    const prev = this.history.find(h => h.id === item.id) || {};
+    this.history = [{
+      id: item.id,
+      type: item.type || "movie",
+      title: item.title || prev.title,
+      poster: item.poster || prev.poster,
+      season,
+      episode,
+      updatedAt: Date.now()
+    }, ...this.history.filter(h => h.id !== item.id)].slice(0, 20);
+    this.persistHistory();
+  }
+
+  persistHistory() {
+    try {
+      localStorage.setItem("yuknonton_history", JSON.stringify(this.history));
+    } catch (e) {}
+  }
+
+  renderContinueWatching() {
+    if (!this.rowsContainer) return;
+    document.getElementById("continueRow")?.remove();
+    if (this.currentCategory !== "home" || this.history.length === 0) return;
+
+    const rowDiv = document.createElement("div");
+    rowDiv.id = "continueRow";
+    rowDiv.className = "relative mb-8";
+    rowDiv.innerHTML = `
+      <h2 class="text-lg md:text-xl lg:text-2xl font-bold mb-3 px-4 md:px-12 text-gray-100">▶️ Lanjutkan Menonton</h2>
+      <div class="flex items-center space-x-3 md:space-x-4 overflow-x-auto hide-scrollbar px-4 md:px-12 py-4">
+        ${this.history.map(h => `
+          <div class="flex-none w-36 md:w-48 lg:w-56 rounded-md overflow-hidden relative shadow-md cursor-pointer movie-card group bg-[#181818]" data-id="${esc(h.id)}">
+            <div class="h-52 md:h-72 lg:h-80 relative">
+              <img src="${esc(h.poster)}" alt="${esc(h.title)}" class="w-full h-full object-cover" loading="lazy" />
+              <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
+                <i data-lucide="play" class="w-10 h-10 text-white fill-current"></i>
+              </div>
+              <button class="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/70 hover:bg-red-600 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition remove-history" title="Hapus dari riwayat">
+                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+            <div class="p-2.5">
+              <h4 class="font-bold text-xs md:text-sm text-white truncate">${esc(h.title)}</h4>
+              <span class="text-[11px] text-gray-400">${h.type === "series" ? `S${esc(h.season)}:E${esc(h.episode)}` : "Film"}</span>
+            </div>
+          </div>
+        `).join("")}
+      </div>
+    `;
+
+    rowDiv.querySelectorAll(".movie-card").forEach(card => {
+      card.onclick = (e) => {
+        const entry = this.history.find(h => h.id === card.dataset.id);
+        if (!entry) return;
+        if (e.target.closest(".remove-history")) {
+          this.history = this.history.filter(h => h.id !== entry.id);
+          this.persistHistory();
+          this.renderContinueWatching();
+          return;
+        }
+        this.openPlayer(entry, entry.season, entry.episode);
+      };
+    });
+
+    this.rowsContainer.prepend(rowDiv);
+    if (window.lucide) lucide.createIcons();
   }
 }
 
